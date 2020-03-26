@@ -1,0 +1,40 @@
+---
+- name: Management Interface Configuration
+  command: chroot /mnt/gentoo bash -c "cd /etc/init.d; ln -s net.lo net.{{ management_interface }}"
+  args:
+    creates: "/mnt/gentoo/etc/init.d/net.{{ management_interface }}"
+
+#- name: Configure Default Interface (OpenRC)
+#  template:
+#    src: net
+#    dest: /mnt/gentoo/etc/conf.d/net
+
+- name: Add systemd-networkd config that tells it to use DHCP for basically any network
+  copy:
+    src: 50-dhcp.network
+    dest: /mnt/gentoo/etc/systemd/network/50-dhcp.network
+
+- name: Enable systemd-networkd on boot
+  command: chroot /mnt/gentoo bash -c 'systemctl enable systemd-networkd'
+
+#- name: Add Interface Default Run Configuration (OpenRC)
+#  command: chroot /mnt/gentoo bash -c 'rc-update add net.{{ management_interface }} default'
+
+- name: Enable sshd with systemd
+  command: chroot /mnt/gentoo bash -c 'systemctl enable sshd'
+
+#- name: Add SSHD to Default Run Configuration (OpenRC)
+#  command: chroot /mnt/gentoo bash -c 'rc-update add sshd default'
+
+- name: Create root .ssh Directory
+  file:
+    path: /mnt/gentoo/root/.ssh
+    state: directory
+    mode: 0700
+
+- name: Configure root authorized_keys
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', pubkey) }}"
+    path: "/mnt/gentoo/root/.ssh/authorized_keys"
+...

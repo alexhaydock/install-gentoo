@@ -1,0 +1,3 @@
+{{ main_disk }}{{ boot_part_no }}		/boot		vfat	noauto,noatime	1 2
+/dev/mapper/main-swap	none		swap	sw		0 0
+/dev/mapper/main-root	/		xfs	noatime		0 1

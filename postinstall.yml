@@ -1,0 +1,29 @@
+---
+- hosts: default
+  name: Gentoo Stage3 Post-Install (Installed Environment)
+  gather_facts: true
+
+  pre_tasks:
+  - name: Check time
+    command: date
+    register: datepre
+    changed_when: False
+  - debug: msg="{{ datepre.stdout }}"
+
+  - name: Run ntp sync in case we have restored a VM snapshot and the clock is wrong
+    command: ntpd -q -g
+    changed_when: False
+
+  - name: Check time again
+    command: date
+    register: datepost
+    changed_when: False
+  - debug: msg="{{ datepost.stdout }}"
+
+  roles:
+  # After the initial run, these actions are performed on the host directly.
+  # We can include or exclude them at playbook run time based on tags.
+  - role: packages
+  - role: gnome-desktop
+  - role: users
+...

@@ -1,0 +1,63 @@
+{
+  "variables": {
+    "output_dir": "output-gentoo-local"
+  },
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "install.yml"
+    },
+    {
+      "type": "ansible",
+      "playbook_file": "postinstall.yml",
+      "pause_before": "300s"
+    }
+  ],
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "output_directory": "{{ user `output_dir` }}",
+      "boot_command": [
+        "passwd<enter><wait5>root-password<enter><wait5>root-password<enter><wait5>",
+        "<enter><wait5>",
+        "sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config",
+        "<enter><wait5>",
+        "echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config",
+        "<enter><wait5>",
+        "rc-service sshd start",
+        "<enter><wait5>"
+      ],
+      "boot_wait": "120s",
+      "disk_size": 65536,
+      "guest_os_type": "Gentoo_64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_urls": [
+        "https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20200322T214504Z/install-amd64-minimal-20200322T214504Z.iso"
+      ],
+      "iso_checksum_type": "sha512",
+      "iso_checksum": "3e5840b1222ab41c07171f8e14e1667181e3e8f3cc2a26d3818fd3bc6c50d924fbbadf367dcfad59a9d59bc14760fd51353c6d070d87532c144f36f01f2c2a7c",
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "ssh_username": "root",
+      "ssh_password": "root-password",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "guest_additions_path": "VBoxGuestAdditions.iso",
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "install-gentoo",
+      "iso_interface": "sata",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "8192"],
+        ["modifyvm", "{{.Name}}", "--cpus", "4"],
+        ["modifyvm", "{{.Name}}", "--firmware", "EFI"],
+        ["modifyvm", "{{.Name}}", "--vram", "128"]
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "output": "builds/{{.Provider}}-gentoo.box",
+      "type": "vagrant"
+    }
+  ]
+}

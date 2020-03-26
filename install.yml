@@ -1,0 +1,65 @@
+---
+- hosts: default
+  name: Gentoo Stage3 Install (LiveCD Environment)
+  gather_facts: true
+
+  pre_tasks:
+  - name: Show kernel version (pre-update)
+    command: uname -a
+    register: kernelpre
+    changed_when: False
+  - debug: msg="{{ kernelpre.stdout }}"
+
+  - name: Check time
+    command: date
+    register: datepre
+    changed_when: False
+  - debug: msg="{{ datepre.stdout }}"
+
+  - name: Run ntp sync in case we have restored a VM snapshot and the clock is wrong
+    command: ntpd -q -g
+    changed_when: False
+
+  - name: Check time again
+    command: date
+    register: datepost
+    changed_when: False
+  - debug: msg="{{ datepost.stdout }}"
+
+  - name: Check the remote host to see whether we've already configured the disks
+    stat: path=/tmp/disks_completed
+    register: disks_completed
+
+  - name: Check the remote host to see whether we've configured the filesystems
+    stat: path=/tmp/filesystems_completed
+    register: filesystems_completed
+
+  - name: Check the remote host to see whether we've already completed the stage3 step
+    stat: path=/tmp/stage3_completed
+    register: stage3_completed
+
+  - name: Check whether we've built a kernel yet
+    stat: path=/tmp/kernel_built
+    register: kernel_built
+
+  roles:
+  - role: disk-layout
+    when: not disks_completed.stat.exists
+
+  - role: filesystems
+    when: not filesystems_completed.stat.exists
+
+  - role: stage3
+    when: not stage3_completed.stat.exists
+
+  - role: kernel
+    when: not kernel_built.stat.exists
+
+  - role: networking
+  - role: system
+  - role: bootloader
+
+  post_tasks:
+  - name: Reboot
+    command: 'sync && shutdown -r now'
+...

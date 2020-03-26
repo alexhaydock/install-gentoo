@@ -1,0 +1,3 @@
+.DS_Store
+packer_cache/
+output-gentoo-local/

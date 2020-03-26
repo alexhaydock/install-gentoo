@@ -1,0 +1,65 @@
+---
+# This is an example of a section where we've had to override the error handling in Ansible.
+# We actively want a non-zero return code of `1` for this task, so we need to tell it that a
+# non-zero return is just to be treated as a "change" and not as an error, otherwise the play stops.
+- name: Generate USE flags for the dependencies to installing MATE
+  command: emerge mate-base/mate --autounmask-write
+  register: result
+  ignore_errors: True
+  tags:
+    - desktop
+
+- name: Merge the newly generated USE flags into /etc/portage/package.use/zz-autounmask
+  command: etc-update --automode -5
+  tags:
+    - desktop
+
+- name: Configure TigerVNC to use the 'server' USE flag via package.use
+  copy:
+    src: tigervnc
+    dest: /etc/portage/package.use/tigervnc
+  tags:
+    - desktop
+
+- name: Install Xorg, LightDM, and MATE
+  portage:
+    package: '{{ item }}'
+  with_items:
+    - x11-base/xorg-server
+    - sys-apps/dbus
+    - x11-apps/xdm
+    - x11-misc/lightdm
+    - net-misc/tigervnc
+    - media-libs/mesa
+    - mate-base/mate
+  tags:
+    - desktop
+
+- name: Enable dbus
+  service:
+    name: dbus
+    enabled: yes
+  tags:
+    - desktop
+
+- name: Enable LightDM service
+  service:
+    name: xdm
+    enabled: yes
+  tags:
+    - desktop
+
+- name: Set LightDM as default display manager in /etc/conf.d/xdm
+  copy:
+    src: xdm
+    dest: /etc/conf.d/xdm
+  tags:
+    - desktop
+
+- name: Install LightDM config
+  copy:
+    src: lightdm.conf
+    dest: /etc/lightdm/lightdm.conf
+  tags:
+    - desktop
+...

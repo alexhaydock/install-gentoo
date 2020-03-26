@@ -1,0 +1,56 @@
+---
+- name: Enable systemd-timesyncd for NTP
+  service:
+    name: systemd-timesyncd
+    enabled: yes
+  tags:
+    - postinstall
+
+- name: Set hostname
+  command: hostnamectl set-hostname {{ gentoo_hostname }}
+  tags:
+    - desktop
+
+- name: Install useful system packages
+  portage:
+    package: '{{ item }}'
+  with_items:
+    - dev-python/pip
+    - dev-vcs/git
+    - app-emulation/docker
+  tags:
+    - desktop
+
+- name: Install GNOME
+  portage:
+    package: gnome-base/gnome-light
+  tags:
+    - desktop
+
+- name: Enable dbus
+  service:
+    name: dbus
+    enabled: yes
+  tags:
+    - desktop
+
+- name: Enable GDM
+  service:
+    name: gdm
+    enabled: yes
+  tags:
+    - desktop
+
+- name: Enable Docker
+  service:
+    name: docker
+    enabled: yes
+  tags:
+    - desktop
+
+- name: Emerge Firefox (be prepared... this will take a LONG time)
+  portage:
+    package: www-client/firefox
+  tags:
+    - desktop
+...

@@ -1,0 +1,107 @@
+---
+# stage3 & base system installation
+# https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Stage
+# https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base
+
+- name: Copy Over Stage Retrieval Script
+  template:
+    src: get_stage.sh
+    dest: /mnt/gentoo/
+    mode: 0755
+
+- name: Download Stage3 Tarball
+  command: /mnt/gentoo/get_stage.sh chdir=/mnt/gentoo
+
+- name: Unarchive Stage3 Tarball
+  unarchive:
+    src: /mnt/gentoo/stage3.tar.bz2
+    dest: /mnt/gentoo/
+    remote_src: yes
+
+- name: proc bind mounts
+  command: mount -t proc proc /mnt/gentoo/proc creates=/mnt/gentoo/proc/zoneinfo
+  tags:
+  - skip_ansible_lint
+
+- name: dev bind mounts
+  command: mount --rbind /dev /mnt/gentoo/dev creates=/mnt/gentoo/dev/zero
+  tags:
+  - skip_ansible_lint
+
+- name: sys bind mounts
+  command: mount --rbind /sys /mnt/gentoo/sys creates=/mnt/gentoo/sys/dev
+  tags:
+  - skip_ansible_lint
+
+- name: Cleanup Stage3 Archive
+  file:
+    path: /mnt/gentoo/stage3.tar.bz2
+    state: absent
+
+- name: Cleanup get_stage.sh
+  file:
+    path: /mnt/gentoo/get_stage.sh
+    state: absent
+
+- name: copy resolv.conf
+  command: cp -L /etc/resolv.conf /mnt/gentoo/etc/ creates=/mnt/gentoo/etc/resolv.conf
+
+- name: create portage directory
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; mkdir /usr/portage' creates=/mnt/gentoo/usr/portage
+
+- name: Install ebuild repo snapshot
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; /usr/bin/emerge-webrsync' creates=/mnt/gentoo/usr/portage/xfce-extra
+
+# This shouldn't really be necessary as per the Gentoo Handbook, but 'eselect profile list' was just showing
+# up no profiles at all without it.
+- name: Update ebuild repo
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; /usr/bin/emerge --sync'
+
+- name: Set timezone
+  command: chroot /mnt/gentoo bash -c 'cp /usr/share/zoneinfo/{{ timezone }} /etc/localtime; echo "{{ timezone }}" > /etc/timezone'
+
+- name: Configure /etc/hosts
+  template:
+    src: hosts
+    dest: /mnt/gentoo/etc/hosts
+
+# Doesn't work since it gives us an error about not being booted with systemd
+#- name: Set Hostname (systemd)
+#  command: chroot /mnt/gentoo bash -c 'hostnamectl set-hostname {{ gentoo_hostname }}'
+
+#- name: Set Hostname (OpenRC)
+#  template:
+#    src: hostname
+#    dest: /mnt/gentoo/etc/conf.d/hostname
+
+- name: Configure /etc/fstab
+  template:
+    src: fstab
+    dest: /mnt/gentoo/etc/fstab
+
+- name: Create /etc/portage/make.conf
+  template:
+    src: make.conf
+    dest: /mnt/gentoo/etc/portage/make.conf
+
+- name: Create /etc/portage/package.use
+  copy:
+    src: package.use
+    dest: /mnt/gentoo/etc/portage/package.use
+
+- name: Copy locale.gen over to configure the supported locales for the system
+  copy:
+    src: locale.gen
+    dest: /etc/locale.gen
+
+- name: Configure locales
+  command: chroot /mnt/gentoo bash -c 'locale-gen'
+
+- name: Set locale
+  copy:
+    src: 02locale
+    dest: /etc/env.d/02locale
+
+- name: Mark this section done
+  command: touch /tmp/stage3_completed
+...

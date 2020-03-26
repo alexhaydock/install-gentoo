@@ -1,0 +1,68 @@
+---
+# Disks
+# https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks
+
+#TODO: port to module parted when issues will be fixed
+# https://github.com/ansible/ansible/issues/26905
+# https://github.com/ansible/ansible/issues/23914
+# https://github.com/ansible/ansible/issues/27841
+# https://github.com/ansible/ansible/issues/26890
+- name: Make Partition Labels
+  command: "parted -s {{ main_disk }} mklabel gpt"
+
+# We don't need the bios_grub partition if we're booting EFI
+- name: Create Grub BIOS Partition
+  parted:
+    device: "{{ main_disk }}"
+    number: 1
+    part_start: 1MiB
+    part_end: 3MiB
+    flags: [ bios_grub ]
+    state: present
+    label: gpt
+  when: firmware_type == 'bios'
+
+# For BIOS boot we do the same as below but we need to set a part_start since we have the bios_grub partition.
+# We also don't set the ESP flag here but I don't think it'd hurt if we did.
+- name: Create /boot partition (if we're running BIOS)
+  parted:
+    device: "{{ main_disk }}"
+    number: "{{ boot_part_no }}"
+    part_start: 3MiB
+    part_end: 256MiB
+    state: present
+    label: gpt
+  when: firmware_type == 'bios'
+
+# For UEFI boot it is very important that the esp and boot flags are present on the
+# EFI system partition. Just setting 'esp' is enough as this is shorthand for 'esp, boot'.
+- name: Create /boot partition (if we're running EFI)
+  parted:
+    device: "{{ main_disk }}"
+    number: "{{ boot_part_no }}"
+    part_end: 256MiB
+    flags: [ esp ]
+    state: present
+    label: gpt
+  when: firmware_type == 'efi'
+
+- name: Format /boot Partition
+  filesystem:
+    fstype: "vfat"
+    dev: "{{ main_disk }}{{ boot_part_no }}"
+    force: "{{ force_format }}"
+    opts: "-F 32"
+
+# This partition number is set conditionally within group_vars/all based on what we've set firmware_type to
+- name: Create main data partition
+  parted:
+    device: "{{ main_disk }}"
+    number: "{{ data_part_no }}"
+    part_start: 256MiB
+    flags: [ lvm ]
+    state: present
+    label: gpt
+
+- name: Write state file to show this task has completed
+  command: touch /tmp/disks_completed
+...

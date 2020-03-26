@@ -1,0 +1,60 @@
+---
+# For some reason the python2.7 emerge (dependency of something else) breaks if we don't remount /dev before emerging it
+# See: https://forums.gentoo.org/viewtopic-t-982100-start-0.html
+- name: Remount /dev to get /dev/mapper visible
+  command: mount --rbind /dev /mnt/gentoo/dev
+  tags:
+  - skip_ansible_lint
+
+- name: re-emerge world since we have updated USE flags because of make.conf and package.use
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --update --newuse --deep --quiet @world'
+
+- name: emerge app-portage/eix
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-portage/eix'
+  args:
+    creates: /mnt/gentoo/usr/bin/eix
+
+- name: emerge app-admin/syslog-ng
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-admin/syslog-ng'
+  args:
+    creates: /mnt/gentoo/usr/sbin/syslog-ng
+
+- name: Enable syslog-ng systemd service
+  command: chroot /mnt/gentoo bash -c 'systemctl enable syslog-ng@default'
+
+- name: emerge sys-process/cronie
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-process/cronie'
+  args:
+    creates: /mnt/gentoo/etc/init.d/cronie
+
+- name: Enable cronie systemd service
+  command: chroot /mnt/gentoo bash -c 'systemctl enable cronie'
+
+# The --deep flag is recommended here: https://wiki.gentoo.org/wiki/GRUB2#Emerge
+- name: emerge sys-boot/grub
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --deep sys-boot/grub'
+  args:
+    creates: /mnt/gentoo/usr/sbin/grub-install
+
+# We need gentoolkit to use the Ansible portage modules later on once we're actually
+# booted into the installed system.
+- name: emerge app-portage/gentoolkit
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-portage/gentoolkit'
+  args:
+    creates: /mnt/gentoo/usr/bin/equery
+
+- name: emerge sys-apps/dbus
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-apps/dbus'
+
+- name: emerge app-admin/sudo
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-admin/sudo'
+
+- name: emerge sys-process/htop
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-process/htop'
+
+- name: emerge app-misc/tmux
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-misc/tmux'
+
+- name: Set root password
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; echo "root:{{ root_passwd }}" | /usr/sbin/chpasswd'
+...

@@ -1,0 +1,14 @@
+[local]
+127.0.0.1 ansible_connection=local
+
+[chroot]
+/mnt/gentoo ansible_connection=chroot
+
+[gentoo]
+10.10.99.20 ansible_connection=ssh
+
+[gentoo:vars]
+ansible_user='root'
+ansible_ssh_pass='root-password'
+ansible_connection=paramiko
+this_machine_is_remote=true

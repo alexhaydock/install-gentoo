@@ -1,0 +1,24 @@
+# After changing USE flags, run:
+#   emerge --update --newuse --deep --quiet @world
+
+# for the time being we need to disable cgroupsv2 so we can install Docker
+sys-apps/systemd cgroup-hybrid
+
+# install firmware with genkernel
+sys-kernel/genkernel firmware
+
+# install non-free redistributable firmware
+sys-kernel/linux-firmware redistributable
+
+# try and slim down grub a bit so it pulls in fewer deps
+sys-boot/grub -themes -truetype
+
+# try and make the bindist flag consistent for openssl
+# this solves the "slot conflict" that otherwise happens when we try and install GNOME
+# seems to happen even if we set the -bindist flag globally in make.conf so I assume it is
+# because it is a local flag for this package, or it needs to be set locally for some reason.
+dev-libs/openssl -bindist
+
+# required for bulding Firefox
+media-libs/libvpx postproc
+dev-db/sqlite secure-delete

@@ -1,0 +1,33 @@
+---
+ansible_user: "root"
+ansible_pass: "root-password"
+ansible_become_pass: "root-password"
+root_passwd: "root-password"
+# Acceptable values for firmware_type: 'bios', 'efi'
+firmware_type: 'bios'
+boot_part_no: "{{ '2' if firmware_type == 'bios' else '1' }}"
+data_part_no: "{{ '3' if firmware_type == 'bios' else '2' }}"
+# Disable SSH key checking because our host key will change halfway through this playbook
+# (as we transition from booted live OS to installed OS) and otherwise the playbook run just stops.
+ansible_host_key_checking: false
+gentoo_hostname: gentoo
+unprivileged_user: user
+pubkey: ~/.ssh/id_ed25519.pub
+# Note: My testing is being done in libvirt now so the paravirt disk driver shows up as /dev/vda
+main_disk: /dev/sda
+root_size: 95%FREE
+swap_size: 4096m
+vg_name: main
+# Using XFS for / (via LVM) since using EXT4 caused the disk to run out of inodes during an emerge --sync.
+# Yes I could probably set some command line options on the EXT4 fs creation but this was easier and I'm lazy.
+mainfstype: xfs
+force_format: no
+mirror: https://gentoo.osuosl.org
+timezone: Europe/London
+domain: localdomain
+# Use -jN as our build argument (where N is the number of threads available to us)
+make_opts: "-j{{ ansible_processor_vcpus }}"
+management_interface: "{{ ansible_default_ipv4.interface }}"
+gateway: "{{ ansible_default_ipv4.gateway }}"
+netmask: "{{ ansible_default_ipv4.netmask }}"
+...
