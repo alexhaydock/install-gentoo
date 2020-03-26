@@ -1,10 +1,12 @@
-# ansible-gentoostage3
+# ansible-gentoo
+
+[![pipeline status](https://gitlab.com/alexhaydock/ansible-gentoo/badges/master/pipeline.svg)](https://gitlab.com/alexhaydock/ansible-gentoo/-/commits/master)
 
 This is a learning project to see whether I could actually achieve the feat of automating an entire stage3 tarball based install of Gentoo with Ansible. Please feel free to copy, modify or use it, but don't expect it to be bug-free or work entirely as expected.
 
 Thanks to [jameskyle/ansible-gentoo](https://github.com/jameskyle/ansible-gentoo) for some of the code in the disks/filesystem roles.
 
-![Screenshot of installed Gentoo system with GNOME3](https://gitlab.com/alexhaydock/ansible-gentoostage3/raw/master/screenshot.png)
+![Screenshot of installed Gentoo system with GNOME3](https://gitlab.com/alexhaydock/ansible-gentoo/raw/master/screenshot.png)
 
 ### Project Scope
 This project loosely follows the Gentoo Handbook and configures a stage3 Gentoo install as follows:
