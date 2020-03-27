@@ -23,7 +23,9 @@
   roles:
   # After the initial run, these actions are performed on the host directly.
   # We can include or exclude them at playbook run time based on tags.
+  - role: postinstall-general
   - role: packages
+  - role: docker
   - role: gnome-desktop
   - role: users
 ...

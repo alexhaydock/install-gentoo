@@ -1,0 +1,13 @@
+---
+- name: Create /root/.ssh
+  file:
+    path: /mnt/gentoo/root/.ssh
+    state: directory
+    mode: '0700'
+
+- name: Install Packer SSH pubkey into chroot so we can connect again for the postinstall step
+  copy:
+    src: "{{ lookup('file', pubkey) }}"
+    dest: /mnt/gentoo/root/.ssh/authorized_keys
+    mode: '0644'
+...

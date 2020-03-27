@@ -46,15 +46,18 @@ Anyway, as I'd hoped, I learned a lot from this project, and my progress buildin
 
 ### Pre-reqs
 Locally:
-* Install Ansible, Packer, VirtualBox and `sshpass`:
-  * `sudo apt install python3-pip sshpass && python3 -m pip install --user ansible`
+* Install Ansible, Packer, and VirtualBox:
+  * Ansible: `sudo apt install python3-pip && python3 -m pip install --user ansible`
 * Ensure that your local `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms etc, otherwise things will fail.
+* Generate an SSH key for Packer builds. Packer can generate keys itself but it is much more robust for this build to generate our own, as it involves two steps (one run against a LiveCD mostly acting inside a chroot, and one run post-reboot against a live installed system):
+  * `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
 
 Suggested host ssh client config:
 ```
 Host 127.0.0.1
     HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,ssh-rsa,ssh-dss
     Ciphers chacha20-poly1305@openssh.com,aes128-ctr,aes256-ctr
+    IdentityFile ~/.ssh/id_rsa_Packer
 ```
 
 ### Invoke Packer installation to build a Vagrant box

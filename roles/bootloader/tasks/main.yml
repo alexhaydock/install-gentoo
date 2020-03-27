@@ -3,14 +3,15 @@
 - name: Configure grub defaults
   copy: src=grub_default dest=/mnt/gentoo/etc/default/grub mode=0644 owner=root group=root
 
-# Install GRUB for BIOS systems
-#- name: Install Grub to /boot (BIOS)
-#  command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-install {{ main_disk }}'
+- name: Install Grub to /boot (BIOS)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-install {{ main_disk }}'
+  when: firmware_type == 'bios'
 
 # Without the --target and --efi-directory specified here we get a "cannot find EFI directory" error
 # See: https://wiki.gentoo.org/wiki/GRUB2/Troubleshooting
 - name: Install Grub to /boot (EFI)
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-install --target=x86_64-efi --efi-directory=/boot {{ main_disk }}'
+  when: firmware_type == 'efi'
 
 - name: Configure /boot/grub/grub.cfg
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-mkconfig -o /boot/grub/grub.cfg'
@@ -28,7 +29,4 @@
 
 #- name: Write bootloader using efibootmgr
 #  command: chroot /mnt/gentoo bash -c 'source /etc/profile; efibootmgr --create --disk {{ main_disk }} --part 1 --label "Gentoo" --loader "\efi\boot\bootx64.efi" initrd="\initramfs-genkernel-amd64-{{ kernelversion.stdout }}-gentoo"'
-
-- name: Sync disks before ending playbook
-  command: sync
 ...

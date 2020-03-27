@@ -1,0 +1,13 @@
+---
+- name: Enable systemd-timesyncd for NTP
+  service:
+    name: systemd-timesyncd
+    enabled: yes
+  tags:
+    - postinstall
+
+- name: Set hostname
+  command: hostnamectl set-hostname {{ gentoo_hostname }}
+  tags:
+    - desktop
+...

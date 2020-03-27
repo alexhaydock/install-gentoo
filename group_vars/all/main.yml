@@ -4,7 +4,7 @@ ansible_pass: "root-password"
 ansible_become_pass: "root-password"
 root_passwd: "root-password"
 # Acceptable values for firmware_type: 'bios', 'efi'
-firmware_type: 'bios'
+firmware_type: 'efi'
 boot_part_no: "{{ '2' if firmware_type == 'bios' else '1' }}"
 data_part_no: "{{ '3' if firmware_type == 'bios' else '2' }}"
 # Disable SSH key checking because our host key will change halfway through this playbook
@@ -12,8 +12,8 @@ data_part_no: "{{ '3' if firmware_type == 'bios' else '2' }}"
 ansible_host_key_checking: false
 gentoo_hostname: gentoo
 unprivileged_user: user
-pubkey: ~/.ssh/id_ed25519.pub
-# Note: My testing is being done in libvirt now so the paravirt disk driver shows up as /dev/vda
+pubkey: ~/.ssh/id_ed25519_Packer.pub
+# Note: If testing in libvirt/QEMU then be aware that the main disk will turn up as /dev/vda
 main_disk: /dev/sda
 root_size: 95%FREE
 swap_size: 4096m

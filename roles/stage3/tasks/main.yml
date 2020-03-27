@@ -65,15 +65,6 @@
     src: hosts
     dest: /mnt/gentoo/etc/hosts
 
-# Doesn't work since it gives us an error about not being booted with systemd
-#- name: Set Hostname (systemd)
-#  command: chroot /mnt/gentoo bash -c 'hostnamectl set-hostname {{ gentoo_hostname }}'
-
-#- name: Set Hostname (OpenRC)
-#  template:
-#    src: hostname
-#    dest: /mnt/gentoo/etc/conf.d/hostname
-
 - name: Configure /etc/fstab
   template:
     src: fstab
