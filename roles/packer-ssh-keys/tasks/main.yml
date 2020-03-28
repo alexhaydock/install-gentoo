@@ -7,7 +7,7 @@
 
 - name: Install Packer SSH pubkey into chroot so we can connect again for the postinstall step
   copy:
-    src: "{{ lookup('file', pubkey) }}"
+    src: "{{ pubkey }}"
     dest: /mnt/gentoo/root/.ssh/authorized_keys
     mode: '0644'
 ...
