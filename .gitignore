@@ -1,3 +1,4 @@
 .DS_Store
+builds/
 packer_cache/
-output-gentoo-local/
+gentoo-box/

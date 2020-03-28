@@ -1,6 +1,6 @@
 {
   "variables": {
-    "output_dir": "output-gentoo-local"
+    "output_dir": "gentoo-box"
   },
   "provisioners": [
     {

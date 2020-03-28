@@ -58,6 +58,7 @@
   - role: networking
   - role: system
   - role: bootloader
+  - role: packer-ssh-keys
 
   post_tasks:
   - name: Sync disks before ending playbook
