@@ -50,6 +50,8 @@
 - name: Install initramfs
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel --lvm --install initramfs'
 
-- name: Mark this section done
-  command: touch /tmp/kernel_built
+  - name: Write state file to show this task has completed
+  file:
+    path: /tmp/kernel_built
+    state: touch
 ...

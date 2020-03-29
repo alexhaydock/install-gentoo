@@ -44,23 +44,27 @@ Anyway, as I'd hoped, I learned a lot from this project, and my progress buildin
 * This is also not Gentoo Hardened, but I will consider that `eselect profile` too.
 * You need at least 4GB RAM to build a proper system with GNOME. Once it gets to building bits like Webkit and Spidermonkey, it will happily shoot up to 4.5GB+ used. So really 8GB is a bare minimum for desktop Gentoo unless you want to be grinding swap all day.
 
+---
+
+# Building a local VM with Packer (recommended)
+
 ### Pre-reqs
-Locally:
-* Install Ansible, Packer, and VirtualBox:
-  * Ansible: `sudo apt install python3-pip && python3 -m pip install --user ansible`
-* Ensure that your local `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms etc, otherwise things will fail.
-* Generate an SSH key for Packer builds. Packer can generate keys itself but it is much more robust for this build to generate our own, as it involves two steps (one run against a LiveCD mostly acting inside a chroot, and one run post-reboot against a live installed system):
-  * `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
+* Ansible
+* Packer
+* VirtualBox
+* Nothing listening on port `6666` already on your system (the VM will listen for SSH connections on this port while building)
+
+### Note on Packer and SSH client config
+If you experience an error where Ansible is unable to connect, then ensure your `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms and ciphers.
 
 Suggested host ssh client config:
 ```
 Host 127.0.0.1
     HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,ssh-rsa,ssh-dss
     Ciphers chacha20-poly1305@openssh.com,aes128-ctr,aes256-ctr
-    IdentityFile ~/.ssh/id_rsa_Packer
 ```
 
-### Invoke Packer installation to build a Vagrant box
+### Building a VM with Packer
 ```sh
 packer build -on-error=ask packer.json
 ```
@@ -70,42 +74,38 @@ Looking at [the Packer template](https://gitlab.com/alexhaydock/ansible-gentoo/-
 
 The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-playbook` command (to avoid SSH auth failure caused by trying every key the user might have inside `~/.ssh`). Under normal circumstances this would be sensible, but it causes problems here since we're essentially provisioning two machines. (One being the LiveCD where we connect via SSH and install Gentoo into a chroot, and the other being the installed system we then connect to continue setup.)
 
-### Invoke installation with Ansible  (from remote machine)
-Invocation is scripted via GNU Makefile. 
+---
 
-Edit the inventory file, and then deploy with:
+# Installing to a remote host
+
+### Pre-reqs
+* Ansible
+* Remote host, booted to the latest Gentoo LiveCD
+* Local `inventory` file for Ansible to use
+* Set a root password on the booted LiveCD
+* After install, change the LiveCD's `sshd_config` to allow `root` login with password:
+  * `PasswordAuthentication yes`
+  * `PermitRootLogin yes`
+* Start the SSH server
+
+### Invoke installation with Ansible
+Deploy the first stage of installation (targets the booted LiveCD) with:
 ```sh
-make
+make install
 ```
 
-or, run just the postinstall bit (once you have a working Gentoo system booted on the remote IP):
+and then, once the system is installed and the remote host has rebooted:
 ```sh
 make postinstall
 ```
 
-To run the bit that installs GNOME and creates a desktop system:
-```sh
-make desktop
-```
+---
 
-### Setup VNC
-For VNC to work if using LightDM (my old config), you must set a password in the config file specified in `lightdm.conf`:
-```sh
-vncpasswd /etc/vncpasswd
-```
-
-And then forward VNC to the machine over SSH using something like
-```sh
-ssh user@gentoomachine.net -L 5900:127.0.0.1:5900
-```
+# Development notes for myself
 
 ### TODO
-* Make use of the `ansible_connection=chroot` functionality to perform operations directly inside chroot
 * Ditch GRUB for a more modern systemd boot (in progress)
 * Follow this guide: https://github.com/hiroru/gentoo_install
-* After install the sshd_config has the following lines which we need to change:
-  * `PasswordAuthentication no`
-  * `PermitRootLogin prohibit-password`
 * Check whether the `-icu` USE flag is actually needed.
 
 ### Notes on USE flag choice
