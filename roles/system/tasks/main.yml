@@ -3,6 +3,8 @@
 # See: https://forums.gentoo.org/viewtopic-t-982100-start-0.html
 - name: Remount /dev to get /dev/mapper visible
   command: mount --rbind /dev /mnt/gentoo/dev
+  args:
+    warn: false
   tags:
   - skip_ansible_lint
 

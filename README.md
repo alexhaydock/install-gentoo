@@ -53,6 +53,9 @@ Anyway, as I'd hoped, I learned a lot from this project, and my progress buildin
 * Packer
 * VirtualBox
 * Nothing listening on port `6666` already on your system (the VM will listen for SSH connections on this port while building)
+* An RSA key, generated and stored at `~/.ssh/id_rsa_Packer`
+  * This will be used for the second stage of the playbook run (post-install).
+  * You could generate with: `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
 
 ### Note on Packer and SSH client config
 If you experience an error where Ansible is unable to connect, then ensure your `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms and ciphers.
@@ -82,6 +85,9 @@ The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-p
 * Ansible
 * Remote host, booted to the latest Gentoo LiveCD
 * Local `inventory` file for Ansible to use
+* An RSA key, generated and stored at `~/.ssh/id_rsa_Packer`
+  * This will be used for the second stage of the playbook run (post-install).
+  * You could generate with: `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
 * Edit the `group_vars/all/main.yml` file to set any variables which need setting.
   * In particular, there is a variable in here (`firmware_type`) which must be set to either `bios` or `efi` depending on the system you have booted. Setting this wrong may leave your system unbootable or, more likely, the GRUB installation step will simply fail.
 * Set a root password on the booted LiveCD

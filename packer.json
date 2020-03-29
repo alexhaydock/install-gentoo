@@ -1,6 +1,6 @@
 {
   "variables": {
-    "output_dir": "gentoo-box"
+    "output_dir": "packer_output"
   },
   "provisioners": [
     {
@@ -19,11 +19,11 @@
       "type": "shell-local",
       "environment_vars": [
         "ANSIBLE_HOST_KEY_CHECKING=False",
-        "ANSIBLE_SSH_ARGS='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PreferredAuthentications=password -o PubkeyAuthentication=no'",
+        "ANSIBLE_SSH_ARGS='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'",
         "ANSIBLE_NOCOLOR=True"
       ],
       "inline": [
-        "ansible-playbook --extra-vars 'packer_build_name=virtualbox-iso packer_builder_type=virtualbox-iso' -i $(pwd)/inventory $(pwd)/postinstall.yml"
+        "ansible-playbook --extra-vars 'packer_build_name=virtualbox-iso packer_builder_type=virtualbox-iso' -i $(pwd)/inventory --key-file ~/.ssh/id_rsa_Packer $(pwd)/postinstall.yml"
       ],
       "pause_before": "300s"
     }
@@ -70,7 +70,7 @@
   ],
   "post-processors": [
     {
-      "output": "builds/{{.Provider}}-gentoo.box",
+      "output": "vagrant_output/{{.Provider}}-gentoo.box",
       "type": "vagrant"
     }
   ]
