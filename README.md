@@ -82,6 +82,8 @@ The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-p
 * Ansible
 * Remote host, booted to the latest Gentoo LiveCD
 * Local `inventory` file for Ansible to use
+* Edit the `group_vars/all/main.yml` file to set any variables which need setting.
+  * In particular, there is a variable in here (`firmware_type`) which must be set to either `bios` or `efi` depending on the system you have booted. Setting this wrong may leave your system unbootable or, more likely, the GRUB installation step will simply fail.
 * Set a root password on the booted LiveCD
 * After install, change the LiveCD's `sshd_config` to allow `root` login with password:
   * `PasswordAuthentication yes`

@@ -93,8 +93,8 @@
     src: 02locale
     dest: /etc/env.d/02locale
 
-    - name: Write state file to show this task has completed
-    file:
-      path: /tmp/stage3_completed
-      state: touch
+- name: Write state file to show this task has completed
+  file:
+    path: /tmp/stage3_completed
+    state: touch
 ...
