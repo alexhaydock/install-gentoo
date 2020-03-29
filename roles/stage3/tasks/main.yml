@@ -18,20 +18,26 @@
     dest: /mnt/gentoo/
     remote_src: yes
 
+# Both ansible_lint and Ansible complain about these commands as we're not using
+# the native 'mount' module, but this seems easier for now since we're mounting
+# for the chroot.
 - name: proc bind mounts
   command: mount -t proc proc /mnt/gentoo/proc creates=/mnt/gentoo/proc/zoneinfo
   tags:
   - skip_ansible_lint
+  warn: false
 
 - name: dev bind mounts
   command: mount --rbind /dev /mnt/gentoo/dev creates=/mnt/gentoo/dev/zero
   tags:
   - skip_ansible_lint
+  warn: false
 
 - name: sys bind mounts
   command: mount --rbind /sys /mnt/gentoo/sys creates=/mnt/gentoo/sys/dev
   tags:
   - skip_ansible_lint
+  warn: false
 
 - name: Cleanup Stage3 Archive
   file:
