@@ -22,22 +22,28 @@
 # the native 'mount' module, but this seems easier for now since we're mounting
 # for the chroot.
 - name: proc bind mounts
-  command: mount -t proc proc /mnt/gentoo/proc creates=/mnt/gentoo/proc/zoneinfo
+  command: mount -t proc proc /mnt/gentoo/proc
+  args:
+    creates: /mnt/gentoo/proc/zoneinfo
+    warn: false
   tags:
   - skip_ansible_lint
-  warn: false
 
 - name: dev bind mounts
-  command: mount --rbind /dev /mnt/gentoo/dev creates=/mnt/gentoo/dev/zero
+  command: mount --rbind /dev /mnt/gentoo/dev
+  args:
+    creates: /mnt/gentoo/dev/zero
+    warn: false
   tags:
   - skip_ansible_lint
-  warn: false
 
 - name: sys bind mounts
-  command: mount --rbind /sys /mnt/gentoo/sys creates=/mnt/gentoo/sys/dev
+  command: mount --rbind /sys /mnt/gentoo/sys
+  args:
+    creates: /mnt/gentoo/sys/dev
+    warn: false
   tags:
   - skip_ansible_lint
-  warn: false
 
 - name: Cleanup Stage3 Archive
   file:
