@@ -1,17 +1,7 @@
-.PHONY: main
+.PHONY: main postinstall desktop desktop-all
+
 main:
-	ansible-playbook -i inventory main.yml -vvv --skip-tags "postinstall,desktop"
+	ansible-playbook -i inventory install.yml -vvv --skip-tags "postinstall,desktop"
 
-.PHONY: postinstall
 postinstall:
-	ansible-playbook -i inventory main.yml -vvv --tags "postinstall"
-
-.PHONY: desktop
-desktop:
-	ansible-playbook -i inventory main.yml -vvv --tags "desktop"
-
-.PHONY: desktop-all
-desktop-all:
-	ansible-playbook -i inventory main.yml -vvv --skip-tags "postinstall,desktop"
-	sleep 30
-	ansible-playbook -i inventory main.yml -vvv --tags "desktop"
+	ansible-playbook -i inventory postinstall.yml -vvv --tags "postinstall"

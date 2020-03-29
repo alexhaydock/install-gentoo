@@ -65,6 +65,11 @@ Host 127.0.0.1
 packer build -on-error=ask packer.json
 ```
 
+### Packer Quirks
+Looking at [the Packer template](https://gitlab.com/alexhaydock/ansible-gentoo/-/blob/master/packer.json) in this repo, you will probably find it to be a bit more rigid than Packer 'best practices'. I have to specify a VirtualBox NAT port for SSH manually, and the Ansible playbook is being run with the [local shell provisioner](https://packer.io/docs/provisioners/shell-local.html) instead of the probably more-appropriate [Ansible provisioner](https://packer.io/docs/provisioners/ansible.html).
+
+The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-playbook` command (to avoid SSH auth failure caused by trying every key the user might have inside `~/.ssh`). Under normal circumstances this would be sensible, but it causes problems here since we're essentially provisioning two machines. (One being the LiveCD where we connect via SSH and install Gentoo into a chroot, and the other being the installed system we then connect to continue setup.)
+
 ### Invoke installation with Ansible  (from remote machine)
 Invocation is scripted via GNU Makefile. 
 

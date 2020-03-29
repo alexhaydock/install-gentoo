@@ -1,8 +1,9 @@
 ---
 ansible_user: "root"
 ansible_pass: "root-password"
-ansible_become_pass: "root-password"
-root_passwd: "root-password"
+ansible_ssh_pass: "{{ ansible_pass }}"
+ansible_become_pass: "{{ ansible_pass }}"
+root_passwd: "{{ ansible_pass }}"
 # Acceptable values for firmware_type: 'bios', 'efi'
 firmware_type: 'efi'
 boot_part_no: "{{ '2' if firmware_type == 'bios' else '1' }}"

@@ -54,5 +54,7 @@
     state: mounted
 
 - name: Write state file to show this task has completed
-  command: touch /tmp/filesystems_completed
+  file:
+    path: /tmp/filesystems_completed
+    state: touch
 ...

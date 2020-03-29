@@ -64,5 +64,7 @@
     label: gpt
 
 - name: Write state file to show this task has completed
-  command: touch /tmp/disks_completed
+  file:
+    path: /tmp/disks_completed
+    state: touch
 ...
