@@ -45,18 +45,6 @@
   args:
     creates: /mnt/gentoo/usr/bin/equery
 
-- name: emerge sys-apps/dbus
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-apps/dbus'
-
-- name: emerge app-admin/sudo
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-admin/sudo'
-
-- name: emerge sys-process/htop
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-process/htop'
-
-- name: emerge app-misc/tmux
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-misc/tmux'
-
 - name: Set root password
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; echo "root:{{ root_passwd }}" | /usr/sbin/chpasswd'
 ...

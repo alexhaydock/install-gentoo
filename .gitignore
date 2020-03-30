@@ -1,6 +1,5 @@
 .DS_Store
 .vagrant/
-gentoo-box/
 packer_cache/
 packer_output/
 vagrant_output/

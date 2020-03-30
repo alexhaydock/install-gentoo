@@ -12,7 +12,7 @@ data_part_no: "{{ '3' if firmware_type == 'bios' else '2' }}"
 # (as we transition from booted live OS to installed OS) and otherwise the playbook run just stops.
 ansible_host_key_checking: false
 gentoo_hostname: gentoo
-unprivileged_user: user
+unprivileged_user: vagrant
 pubkey: ~/.ssh/id_rsa_Packer.pub
 # Note: If testing in libvirt/QEMU then be aware that the main disk will turn up as /dev/vda
 main_disk: /dev/sda

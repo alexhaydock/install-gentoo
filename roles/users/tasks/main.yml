@@ -1,4 +1,12 @@
 ---
+- name: Install ZSH before we add our user
+  portage:
+    package:
+      - app-shells/zsh
+      - app-shells/zsh-completions
+  tags:
+    - postinstall
+
 # We need to make sure we run the GNOME installation bit before this so the plugdev group actually exists.
 # We also need to make sure some kind of task has run which has installed sudo so that the wheel group exists.
 - name: Add unprivileged user with access to the groups we need for GNOME
@@ -10,7 +18,7 @@
     # This is just a hashed and salted version of the word 'password' that Ansible can write into /etc/shadow
     password: "$6$nUstNa1Wp.j9uOaq$D8iikJRhUFnmUWdf37KxK1pSm0sxNCnE1MyRbMc4AWUBanS.6PDSHFEk5Gl1KCgoeo51DKb5z.DAvGGhFxLRp1"
   tags:
-    - desktop
+    - postinstall
 
 - name: Allow wheel group sudo access (validate sudoers file before saving)
   lineinfile:
@@ -20,5 +28,5 @@
     line: '%wheel ALL=(ALL) ALL'
     validate: /usr/sbin/visudo -cf %s
   tags:
-    - desktop
+    - postinstall
 ...

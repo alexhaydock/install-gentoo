@@ -3,9 +3,11 @@
   portage:
     package: '{{ item }}'
   with_items:
+    - app-admin/sudo
+    - app-misc/tmux
     - dev-python/pip
     - dev-vcs/git
-    - htop
+    - sys-process/htop
   tags:
     - postinstall
 ...

@@ -34,25 +34,27 @@ So I decided my direction for the project would be to build out a system using t
 
 It's worth noting that you might not actually *want* all of these components in your system. Next-gen does not always mean "ready", and that's certainly something I discovered along the way. But the idea was not to build myself a next-gen system I actually wanted to use. After all, I could just use [Fedora](https://getfedora.org/) for that. I simply wanted to teach myself more about how systems like this are glued together 'under the hood'.
 
-Anyway, as I'd hoped, I learned a lot from this project, and my progress building out this playbook is all tracked in this repo's git history. I can fully recommend it for anyone interested in learning more about how Linux works under the hood.
+Anyway, as I'd hoped, I learned a lot from this project, and I can fully recommend it for anyone interested in lifting the curtain on how a Linux distribution actually fits together.
 
-**Taking it further:** In future, I'd like to automate the **whole** process using Vagrant, with Ansible as a provisioner, as there's still some pre-setup work that needs to be done in the Gentoo LiveCD before this playbook is run (editing the `sshd` config and starting the daemon, and setting the root password).
-
-### Notes / Caveats
+### Known issues / things to bear in mind
+* The default users are `vagrant:password` and `root:root-password`, which aren't great and will need changing after install.
+* The initial `install.yml` playbook isn't fully idempotent, which is generally considered bad Ansible practice.
+  * In reality, this isn't a huge problem though as it's designed to be run against a Gentoo LiveCD to conduct an initial install once and once only.
 * Uses `systemd`. There is no simple way to switch this to OpenRC.
 * There is no LSM active. There is an `eselect profile` with SELinux which I may attempt to use in the future.
 * This is also not Gentoo Hardened, but I will consider that `eselect profile` too.
 * You need at least 4GB RAM to build a proper system with GNOME. Once it gets to building bits like Webkit and Spidermonkey, it will happily shoot up to 4.5GB+ used. So really 8GB is a bare minimum for desktop Gentoo unless you want to be grinding swap all day.
+* This will take **ages** to run. No... seriously... **ages**. My development machine is admittedly showing its age now, but it takes well over 12 hours to finish a Packer run for this system. Interestingly, the majority of that time seems to be spent building Firefox.
 
 ---
 
-# Building a local VM with Packer (recommended)
+## Building a local VM with Packer (recommended)
 
 ### Pre-reqs
 * Ansible
 * Packer
 * VirtualBox
-* Nothing listening on port `6666` already on your system (the VM will listen for SSH connections on this port while building)
+* Nothing listening on port `6666` already on your system (the VM will listen for SSH connections on this port while building).
 * An RSA key, generated and stored at `~/.ssh/id_rsa_Packer`
   * This will be used for the second stage of the playbook run (post-install).
   * You could generate with: `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
@@ -60,7 +62,7 @@ Anyway, as I'd hoped, I learned a lot from this project, and my progress buildin
 ### Note on Packer and SSH client config
 If you experience an error where Ansible is unable to connect, then ensure your `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms and ciphers.
 
-Suggested host ssh client config:
+A resonable `~/.ssh/config` snippet for this:
 ```
 Host 127.0.0.1
     HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,ssh-rsa,ssh-dss
@@ -79,22 +81,23 @@ The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-p
 
 ---
 
-# Installing to a remote host
+## Installing to a remote host over SSH
 
 ### Pre-reqs
 * Ansible
-* Remote host, booted to the latest Gentoo LiveCD
-* Local `inventory` file for Ansible to use
+* Remote host, booted to the latest Gentoo LiveCD.
+* Local `inventory` file for Ansible to use.
 * An RSA key, generated and stored at `~/.ssh/id_rsa_Packer`
   * This will be used for the second stage of the playbook run (post-install).
   * You could generate with: `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
 * Edit the `group_vars/all/main.yml` file to set any variables which need setting.
-  * In particular, there is a variable in here (`firmware_type`) which must be set to either `bios` or `efi` depending on the system you have booted. Setting this wrong may leave your system unbootable or, more likely, the GRUB installation step will simply fail.
-* Set a root password on the booted LiveCD
+  * In particular, `firmware_type` must be set to either `bios` or `efi`. Setting this wrong may leave your system unbootable or, more likely, the GRUB installation step will simply fail.
+* Set a root password on the booted LiveCD.
+  * If you use `root-password` as the password, nothing will need to be changed, otherwise you will need to update a few variables with the password you choose.
 * After install, change the LiveCD's `sshd_config` to allow `root` login with password:
   * `PasswordAuthentication yes`
   * `PermitRootLogin yes`
-* Start the SSH server
+* Start the SSH server.
 
 ### Invoke installation with Ansible
 Deploy the first stage of installation (targets the booted LiveCD) with:
@@ -117,9 +120,8 @@ make postinstall
 * Check whether the `-icu` USE flag is actually needed.
 
 ### Notes on USE flag choice
-* We might need the `-bindist` flag for GNOME because of licensing issues around elliptic curve patents in the OpenSSL ebuild Yeah... what(?)
+* We might need the `-bindist` flag for GNOME because of licensing issues around _elliptic curve patents_ in the OpenSSL ebuild. Yeah... what(?)
   * Anyway, see: https://packages.gentoo.org/useflags/bindist
-* The GNU EFI flag might solve an issue where systemd-boot does not work but is definitely not needed for GRUB (it's not even a valid USE flag for GRUB):
+* The GNU EFI flag might solve an issue where systemd-boot does not work (we don't need to worry about this for GRUB; it's not even a valid USE flag for GRUB):
   * https://forums.gentoo.org/viewtopic-p-8220098.html?sid=6d1708663f6bd8a6e13382d6715980c6#8220098
 * Might need `-consolekit` to avoid conflicts with systemd-logind(?)
-* We (might?) need to use `-icu` to work around a circular dependency issue for emerging grub. (Stops `dev-db/sqlite` using this flag).
