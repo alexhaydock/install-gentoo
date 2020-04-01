@@ -12,7 +12,10 @@ Vagrant.configure("2") do |config|
   config.ssh.insert_key = true
 
   config.vm.provider "virtualbox" do |v|
+    v.name = "Gentoo"
     v.gui = true
+    v.memory = 8192
+    v.cpus = 4
   end
 
 end

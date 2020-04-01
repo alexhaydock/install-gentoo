@@ -63,7 +63,6 @@
       "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--memory", "8192"],
         ["modifyvm", "{{.Name}}", "--cpus", "4"],
-        ["modifyvm", "{{.Name}}", "--firmware", "EFI"],
         ["modifyvm", "{{.Name}}", "--vram", "128"]
       ]
     }

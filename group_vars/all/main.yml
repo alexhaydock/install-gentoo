@@ -5,7 +5,7 @@ ansible_ssh_pass: "{{ ansible_pass }}"
 ansible_become_pass: "{{ ansible_pass }}"
 root_passwd: "{{ ansible_pass }}"
 # Acceptable values for firmware_type: 'bios', 'efi'
-firmware_type: 'efi'
+firmware_type: 'bios'
 boot_part_no: "{{ '2' if firmware_type == 'bios' else '1' }}"
 data_part_no: "{{ '3' if firmware_type == 'bios' else '2' }}"
 # Disable SSH key checking because our host key will change halfway through this playbook
