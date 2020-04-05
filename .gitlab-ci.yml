@@ -1,7 +1,14 @@
+---
 ansible-lint:
-  image: python:3
+  image: registry.gitlab.com/alexhaydock/ci-linter-images/ansible-lint
   stage: test
   script:
-    - python3 -m pip install ansible-lint
     - ansible-lint install.yml
     - ansible-lint postinstall.yml
+
+# Lint all YAML files in this repo (any yaml file, recursively)
+yaml-lint:
+  image: registry.gitlab.com/alexhaydock/ci-linter-images/yamllint
+  stage: test
+  script:
+    - for i in $(find . -name "*.yml" -or -name "*.yaml"); do yamllint "${i}"; done
