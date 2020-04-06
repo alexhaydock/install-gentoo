@@ -5,7 +5,7 @@
 - name: Generate USE flags for the dependencies to installing MATE
   command: emerge mate-base/mate --autounmask-write
   register: result
-  ignore_errors: True
+  ignore_errors: true
   tags:
     - desktop
 
@@ -38,14 +38,14 @@
 - name: Enable dbus
   service:
     name: dbus
-    enabled: yes
+    enabled: true
   tags:
     - desktop
 
 - name: Enable LightDM service
   service:
     name: xdm
-    enabled: yes
+    enabled: true
   tags:
     - desktop
 

@@ -7,23 +7,23 @@
   - name: Show kernel version (pre-update)
     command: uname -a
     register: kernelpre
-    changed_when: False
+    changed_when: false
   - debug: msg="{{ kernelpre.stdout }}"
 
   - name: Check time
     command: date
     register: datepre
-    changed_when: False
+    changed_when: false
   - debug: msg="{{ datepre.stdout }}"
 
   - name: Run ntp sync in case we have restored a VM snapshot and the clock is wrong
     command: ntpd -q -g
-    changed_when: False
+    changed_when: false
 
   - name: Check time again
     command: date
     register: datepost
-    changed_when: False
+    changed_when: false
   - debug: msg="{{ datepost.stdout }}"
 
   - name: Check the remote host to see whether we've already configured the disks
@@ -66,5 +66,5 @@
 
   - name: Reboot
     command: 'shutdown -r now'
-    changed_when: False
+    changed_when: false
 ...

@@ -2,7 +2,7 @@
 # Disks
 # https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks
 
-#TODO: port to module parted when issues will be fixed
+# TODO: port to module parted when issues will be fixed
 # https://github.com/ansible/ansible/issues/26905
 # https://github.com/ansible/ansible/issues/23914
 # https://github.com/ansible/ansible/issues/27841
@@ -17,7 +17,7 @@
     number: 1
     part_start: 1MiB
     part_end: 3MiB
-    flags: [ bios_grub ]
+    flags: ["bios_grub"]
     state: present
     label: gpt
   when: firmware_type == 'bios'
@@ -41,7 +41,7 @@
     device: "{{ main_disk }}"
     number: "{{ boot_part_no }}"
     part_end: 256MiB
-    flags: [ esp ]
+    flags: ["esp"]
     state: present
     label: gpt
   when: firmware_type == 'efi'
@@ -59,7 +59,7 @@
     device: "{{ main_disk }}"
     number: "{{ data_part_no }}"
     part_start: 256MiB
-    flags: [ lvm ]
+    flags: ["lvm"]
     state: present
     label: gpt
 

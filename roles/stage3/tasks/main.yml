@@ -16,7 +16,7 @@
   unarchive:
     src: /mnt/gentoo/stage3.tar.bz2
     dest: /mnt/gentoo/
-    remote_src: yes
+    remote_src: true
 
 # Both ansible_lint and Ansible complain about these commands as we're not using
 # the native 'mount' module, but this seems easier for now since we're mounting

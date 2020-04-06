@@ -2,7 +2,7 @@
 - name: Enable systemd-timesyncd for NTP
   service:
     name: systemd-timesyncd
-    enabled: yes
+    enabled: true
   tags:
     - postinstall
 

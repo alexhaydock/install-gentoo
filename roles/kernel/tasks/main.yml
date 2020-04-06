@@ -27,20 +27,20 @@
   args:
     creates: /mnt/gentoo/usr/bin/genkernel
 
-# It was implied that this is needed for systemd
-#- name: Emerge dracut
-#  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/dracut'
+#  It was implied that this is needed for systemd
+# - name: Emerge dracut
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/dracut'
 
-# So this seems to be necessary to use systemd on LVM(?)
-# https://wiki.gentoo.org/wiki/Systemd
-#- name: Emerge genkernel-next
-#  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel-next'
+#  So this seems to be necessary to use systemd on LVM(?)
+#  https://wiki.gentoo.org/wiki/Systemd
+# - name: Emerge genkernel-next
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel-next'
 
-# Is this needed if we're not following the guide on systemd-boot?
-#- name: Copy genkernel config
-#  copy:
-#    src: genkernel.conf
-#    dest: /mnt/gentoo/etc/genkernel.conf
+#  Is this needed if we're not following the guide on systemd-boot?
+# - name: Copy genkernel config
+#   copy:
+#     src: genkernel.conf
+#     dest: /mnt/gentoo/etc/genkernel.conf
 
 # Build our kernel
 - name: Build genkernel

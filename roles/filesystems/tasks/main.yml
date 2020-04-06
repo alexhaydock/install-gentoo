@@ -24,7 +24,7 @@
     lv: root
     vg: "{{ vg_name }}"
     size: "{{ root_size }}"
-    shrink: no
+    shrink: false
 
 - name: Format root volume
   filesystem:

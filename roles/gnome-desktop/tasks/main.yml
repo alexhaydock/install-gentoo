@@ -14,14 +14,14 @@
 - name: Enable dbus
   service:
     name: dbus
-    enabled: yes
+    enabled: true
   tags:
     - desktop
 
 - name: Enable GDM
   service:
     name: gdm
-    enabled: yes
+    enabled: true
   tags:
     - desktop
 

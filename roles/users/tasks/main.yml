@@ -14,7 +14,7 @@
     name: "{{ unprivileged_user }}"
     shell: /bin/zsh
     groups: wheel,plugdev,video,docker
-    append: yes
+    append: true
     # This is just a hashed and salted version of the word 'password' that Ansible can write into /etc/shadow
     password: "$6$nUstNa1Wp.j9uOaq$D8iikJRhUFnmUWdf37KxK1pSm0sxNCnE1MyRbMc4AWUBanS.6PDSHFEk5Gl1KCgoeo51DKb5z.DAvGGhFxLRp1"
   tags:

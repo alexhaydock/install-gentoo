@@ -19,14 +19,14 @@
     creates: /mnt/gentoo/boot/grub/grub.cfg
 
 ### systemd-boot ###
-#- name: Write bootloader with systemd-boot (efivars need to be mounted but they should be automatically already)
-#  command: chroot /mnt/gentoo bash -c 'source /etc/profile; bootctl install'
+# - name: Write bootloader with systemd-boot (efivars need to be mounted but they should be automatically already)
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; bootctl install'
 
 ### efibootmgr ###
-#- name: Work out newly-built kernel version (hack that just goes off the *running* version -- fix!)
-#  command: chroot /mnt/gentoo bash -c 'source /etc/profile; uname -r | cut -d"-" -f1'
-#  register: kernelversion
+# - name: Work out newly-built kernel version (hack that just goes off the *running* version -- fix!)
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; uname -r | cut -d"-" -f1'
+#   register: kernelversion
 
-#- name: Write bootloader using efibootmgr
-#  command: chroot /mnt/gentoo bash -c 'source /etc/profile; efibootmgr --create --disk {{ main_disk }} --part 1 --label "Gentoo" --loader "\efi\boot\bootx64.efi" initrd="\initramfs-genkernel-amd64-{{ kernelversion.stdout }}-gentoo"'
+# - name: Write bootloader using efibootmgr
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; efibootmgr --create --disk {{ main_disk }} --part 1 --label "Gentoo" --loader "\efi\boot\bootx64.efi" initrd="\initramfs-genkernel-amd64-{{ kernelversion.stdout }}-gentoo"'
 ...

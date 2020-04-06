@@ -22,7 +22,7 @@ vg_name: main
 # Using XFS for / (via LVM) since using EXT4 caused the disk to run out of inodes during an emerge --sync.
 # Yes I could probably set some command line options on the EXT4 fs creation but this was easier and I'm lazy.
 mainfstype: xfs
-force_format: no
+force_format: false
 mirror: https://gentoo.osuosl.org
 timezone: Europe/London
 domain: localdomain
