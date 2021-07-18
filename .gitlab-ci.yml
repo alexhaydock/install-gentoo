@@ -1,14 +1,24 @@
 ---
+# Lint Ansible playbooks
 ansible-lint:
-  image: registry.gitlab.com/alexhaydock/ci-linter-images/ansible-lint
+  image: registry.gitlab.com/contain-yourself/ansible-lint
   stage: test
   script:
-    - ansible-lint install.yml
-    - ansible-lint postinstall.yml
+    # This little cheat will return all of the .yml or .yaml files in the top-level directory (excluding hidden ones)
+    # and will assume that these are all Ansible playbooks to be linted.
+    - for i in $(find . -maxdepth 1 -not -path '*/\.*' -name "*.yml" -or -name "*.yaml"); do echo "Linting ${i}"; ansible-lint "${i}"; echo "Finished with return code $?"; done
+
+# Lint all Dockerfiles in this repo (any Dockerfile, recursively)
+docker-lint:
+  image: projectatomic/dockerfile-lint
+  stage: test
+  script:
+    - for i in $(find . -name "Dockerfile" -or -name "Dockerfile*"); do echo "Linting ${i}"; dockerfile_lint -f "${i}"; echo "Finished with return code $?"; done
 
 # Lint all YAML files in this repo (any yaml file, recursively)
 yaml-lint:
-  image: registry.gitlab.com/alexhaydock/ci-linter-images/yamllint
+  image: registry.gitlab.com/contain-yourself/yamllint
   stage: test
   script:
-    - for i in $(find . -name "*.yml" -or -name "*.yaml"); do yamllint "${i}"; done
+    - for i in $(find . -name "*.yml" -or -name "*.yaml"); do echo "Linting ${i}"; yamllint "${i}"; echo "Finished with return code $?"; done
+...

@@ -11,7 +11,7 @@
         "ANSIBLE_NOCOLOR=True"
       ],
       "inline": [
-        "ansible-playbook --extra-vars 'packer_build_name=virtualbox-iso packer_builder_type=virtualbox-iso' -i $(pwd)/inventory $(pwd)/install.yml"
+        "ansible-playbook --extra-vars 'packer_build_name=virtualbox-iso packer_builder_type=virtualbox-iso' -i $(pwd)/inventory.ini $(pwd)/install.yml"
       ],
       "pause_before": "10s"
     },
@@ -23,7 +23,7 @@
         "ANSIBLE_NOCOLOR=True"
       ],
       "inline": [
-        "ansible-playbook --extra-vars 'packer_build_name=virtualbox-iso packer_builder_type=virtualbox-iso' -i $(pwd)/inventory $(pwd)/postinstall.yml"
+        "ansible-playbook --extra-vars 'packer_build_name=virtualbox-iso packer_builder_type=virtualbox-iso' -i $(pwd)/inventory.ini $(pwd)/postinstall.yml"
       ],
       "pause_before": "300s"
     }

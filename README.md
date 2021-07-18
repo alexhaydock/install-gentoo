@@ -91,7 +91,7 @@ The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-p
 
 ### Pre-reqs (local host)
 * Ansible
-* Local `inventory` file for Ansible to use configured to use the DHCP address of our remote server.
+* Local `inventory.ini` file for Ansible to use configured to use the DHCP address of our remote server.
 * Edit the `group_vars/all/main.yml` file to set any variables which need setting.
   * In particular, `firmware_type` must be set to either `bios` or `efi`. Setting this wrong may leave your system unbootable or, more likely, the GRUB installation step will simply fail.
 
@@ -105,19 +105,3 @@ and then, once the system is installed and the remote host has rebooted:
 ```sh
 make postinstall
 ```
-
----
-
-# Development notes for myself
-
-### TODO
-* Ditch GRUB for a more modern systemd boot (in progress)
-* Follow this guide: https://github.com/hiroru/gentoo_install
-* Check whether the `-icu` USE flag is actually needed.
-
-### Notes on USE flag choice
-* We might need the `-bindist` flag for GNOME because of licensing issues around _elliptic curve patents_ in the OpenSSL ebuild. Yeah... what(?)
-  * Anyway, see: https://packages.gentoo.org/useflags/bindist
-* The GNU EFI flag might solve an issue where systemd-boot does not work (we don't need to worry about this for GRUB; it's not even a valid USE flag for GRUB):
-  * https://forums.gentoo.org/viewtopic-p-8220098.html?sid=6d1708663f6bd8a6e13382d6715980c6#8220098
-* Might need `-consolekit` to avoid conflicts with systemd-logind(?)
