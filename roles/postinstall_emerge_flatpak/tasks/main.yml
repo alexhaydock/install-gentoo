@@ -1,0 +1,7 @@
+---
+- name: Emerge Flatpak
+  portage:
+    package: sys-apps/flatpak
+  tags:
+    - postinstall
+...

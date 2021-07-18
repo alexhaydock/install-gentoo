@@ -1,0 +1,70 @@
+---
+# Kernel (genkernel) config
+# https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel
+
+- name: Check whether we've built a kernel yet
+  stat: path=/tmp/kernel_built
+  register: kernel_built
+
+- name: Emerge Gentoo sources
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge gentoo-sources'
+  args:
+    creates: /mnt/gentoo/usr/src/linux/arch
+  when:
+    - not kernel_built.stat.exists
+
+# Ignore errors here because it has an expected return code of 1
+# TODO: Not really sure how to write this as idempotent, as it writes out a file to an unpredictable temp location.
+- name: Accept the license for linux-firmware if it doesn't exist (relies on CONFIG_PROTECT_MASK in make.conf)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel --autounmask-write'
+  ignore_errors: true
+  when:
+    - not kernel_built.stat.exists
+
+# This step takes the temp unpredictable file from the previous step and writes it out to the more permanent config location.
+- name: Accept the license for linux-firmware if it doesn't exist (relies on CONFIG_PROTECT_MASK in make.conf)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; etc-update --automode -5'
+  args:
+    creates: /mnt/gentoo/etc/portage/package.license
+  when:
+    - not kernel_built.stat.exists
+
+- name: Emerge genkernel (does not build it yet)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel'
+  args:
+    creates: /mnt/gentoo/usr/bin/genkernel
+  when:
+    - not kernel_built.stat.exists
+
+#  It was implied that this is needed for systemd
+# - name: Emerge dracut
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/dracut'
+#  when:
+#    - not kernel_built.stat.exists
+
+#  So this seems to be necessary to use systemd on LVM(?)
+#  https://wiki.gentoo.org/wiki/Systemd
+# - name: Emerge genkernel-next
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel-next'
+#  when:
+#    - not kernel_built.stat.exists
+
+# Build our kernel
+- name: Build genkernel
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel all'
+  when:
+    - not kernel_built.stat.exists
+
+# Builds only initramfs (not an entire kernel) with LVM support
+- name: Install initramfs
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel --lvm --install initramfs'
+  when:
+    - not kernel_built.stat.exists
+
+- name: Write state file to show this task has completed
+  file:
+    path: /tmp/kernel_built
+    state: touch
+  when:
+    - not kernel_built.stat.exists
+...

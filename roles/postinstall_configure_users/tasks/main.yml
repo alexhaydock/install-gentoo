@@ -1,0 +1,14 @@
+---
+# We need to make sure we run the GNOME installation bit before this so the plugdev group actually exists.
+# Similarly, we need to make sure we have already emerged 'sudo' otherwise the wheel group won't exist.
+- name: 'Add unprivileged "{{ unprivileged_user }}" user with access to the groups we need for GNOME'
+  user:
+    name: "{{ unprivileged_user }}"
+    shell: /bin/bash
+    groups: wheel,plugdev,video
+    append: true
+    # This is just a hashed and salted version of the word 'password' that Ansible can write into /etc/shadow
+    password: "{{ unprivileged_user_password | string | password_hash('sha512') }}"
+  tags:
+    - postinstall
+...

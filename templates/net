@@ -1,2 +1,0 @@
-config_{{ management_interface }}="{{ ansible_default_ipv4.address }} netmask  {{ netmask }}"
-routes_{{ management_interface }}="default via {{ gateway }}"

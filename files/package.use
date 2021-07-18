@@ -1,24 +1,31 @@
-# After changing USE flags, run:
-#   emerge --update --newuse --deep --quiet @world
+#
+# After changing USE flags, run an emerge @world with:
+#   emerge --verbose --update --changed-use --deep @world
+#
 
-# for the time being we need to disable cgroupsv2 so we can install Docker
-sys-apps/systemd cgroup-hybrid
+# For the time being we need to disable cgroups v2 so we can install Docker
+# NOTE (Jul 2021): I have since disabled this. We want cgroups v2.
+#sys-apps/systemd cgroup-hybrid
 
-# install firmware with genkernel
+# Install firmware when using genkernel
 sys-kernel/genkernel firmware
 
-# install non-free redistributable firmware
+# Install non-free redistributable firmware when installing linux-firmware
 sys-kernel/linux-firmware redistributable
 
-# try and slim down grub a bit so it pulls in fewer deps
+# Try and slim down grub a bit so it pulls in fewer deps
 sys-boot/grub -themes -truetype
 
-# try and make the bindist flag consistent for openssl
+# Try and make the bindist flag consistent for openssl
 # this solves the "slot conflict" that otherwise happens when we try and install GNOME
 # seems to happen even if we set the -bindist flag globally in make.conf so I assume it is
 # because it is a local flag for this package, or it needs to be set locally for some reason.
 dev-libs/openssl -bindist
 
-# required for bulding Firefox
+# Required flags for bulding Firefox
 media-libs/libvpx postproc
 dev-db/sqlite secure-delete
+
+# Required to sort circular dependency issue
+# See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
+media-libs/freetype harfbuzz

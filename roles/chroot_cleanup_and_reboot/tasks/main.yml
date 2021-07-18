@@ -1,0 +1,8 @@
+---
+- name: Sync disks before ending playbook
+  command: sync
+
+- name: Reboot
+  command: 'shutdown -r now'
+  changed_when: false
+...

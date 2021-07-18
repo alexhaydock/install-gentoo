@@ -1,0 +1,16 @@
+---
+# For some reason the python2.7 emerge (dependency of something else) breaks if we don't remount /dev before emerging it
+# See: https://forums.gentoo.org/viewtopic-t-982100-start-0.html
+- name: Remount /dev to get /dev/mapper visible (otherwise emerging python2.7 breaks)
+  command: mount --rbind /dev /mnt/gentoo/dev
+  args:
+    warn: false
+  tags:
+    - skip_ansible_lint
+
+# TODO: Investigate whether this is an excessive step to take here. It rebuilds all packages from what I can tell
+#       (or does it? it uses --changed use). But it might be useful since it does include --update, which should
+#       pull in any updates to the packages and is something we would probably just do post-install anyway.
+- name: Re-emerge world (since we have updated USE flags because of make.conf and package.use which we copied over during the stage3 role)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --verbose --update --changed-use --deep @world'
+...

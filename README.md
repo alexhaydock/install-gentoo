@@ -1,4 +1,4 @@
-# ansible-gentoo
+# install-gentoo
 
 [![pipeline status](https://gitlab.com/alexhaydock/ansible-gentoo/badges/master/pipeline.svg)](https://gitlab.com/alexhaydock/ansible-gentoo/-/commits/master)
 
@@ -12,14 +12,15 @@ Thanks to [jameskyle/ansible-gentoo](https://github.com/jameskyle/ansible-gentoo
 This project loosely follows the Gentoo Handbook and configures a stage3 Gentoo install as follows:
 * Partitioning disks
 * Creating/mounting filesystems
-* Entering the chroot
 * Downloading and deploying a stage3 tarball
+* Entering the chroot
 * Downloading an emerge snapshot and running `emerge --sync`
+* Downloading and building the Kernel from source
 * Configuring relevant OS services and networking
 * Installing GRUB bootloader to primary disk
-* Installing Docker, GNOME, X.Org and other relevant applications
+* Installing GNOME, X.Org and other relevant applications
 * Creating users
-* Just generally provisioning a full working desktop environment
+* (and just generally provisioning a full working desktop environment)
 
 ### What I learned from this project (and why you should try it too!)
 I wanted to start a project based around a Gentoo Linux system, as Gentoo is notable for taking a very 'bring your own OS' approach to Linux. As a user, you build your own system exactly how you want it, bringing your own kernel, init system, bootloader, window manager & desktop environment, and applications.
@@ -30,21 +31,20 @@ With my project, I hoped that learning to automate the build process of a system
 
 Gentoo is rare among modern Linux distributions in that it still provides first-class support for the OpenRC init system (a.k.a. the old way of doing things). This is what is targeted in the Handbook, and most of the instructions available on the Wiki for other packages assume you are running OpenRC. All is not lost, however, for denizens of planet Red Hat, as Gentoo does make `systemd` available if the user wants to use it. All of the other components of a "next-gen" Linux system are available too: Wayland, `systemd-boot`.
 
-So I decided my direction for the project would be to build out a system using the handbook's suggested setup. After building and automating the handbook's suggested config (over and over, until it works), I would switch out the old-hat components that Gentoo suggests for their fancy modern equivalents. I would switch out OpenRC for systemd, then `grub` for `systemd-boot`, then X.Org for Wayland. Even as simple as migrating from editing `/etc/conf.d/hostname` and `/etc/hosts` to using `hostnamectl`. You get the idea.
+So I decided my direction for the project would be to build out a system using the handbook's suggested setup. After building and automating the handbook's suggested config (over and over, until it works), I started experimenting with switching out the old-hat components that Gentoo suggests for their fancy modern equivalents. I would switch out OpenRC for systemd, then `grub` for `systemd-boot`, then X.Org for Wayland. Even the smaller changes, like migrating from editing `/etc/conf.d/hostname` and `/etc/hosts` to using `hostnamectl`. You get the idea.
 
-It's worth noting that you might not actually *want* all of these components in your system. Next-gen does not always mean "ready", and that's certainly something I discovered along the way. But the idea was not to build myself a next-gen system I actually wanted to use. After all, I could just use [Fedora](https://getfedora.org/) for that. I simply wanted to teach myself more about how systems like this are glued together 'under the hood'.
+It's worth noting that you might not actually *want* all of these next-gen components in your system. Next-gen does not always mean "ready", and that's certainly something I discovered along the way. But the idea was not to build myself a next-gen system I actually wanted to use. After all, I could just use [Fedora](https://getfedora.org/) for that. I simply wanted to teach myself more about how systems like this are glued together 'under the hood'.
 
 Anyway, as I'd hoped, I learned a lot from this project, and I can fully recommend it for anyone interested in lifting the curtain on how a Linux distribution actually fits together.
 
 ### Known issues / things to bear in mind
-* The default users are `vagrant:password` and `root:root-password`, which aren't great and will need changing after install.
-* The initial `install.yml` playbook isn't fully idempotent, which is generally considered bad Ansible practice.
-  * In reality, this isn't a huge problem though as it's designed to be run against a Gentoo LiveCD to conduct an initial install once and once only.
-* Uses `systemd`. There is no simple way to switch this to OpenRC.
+* The default users are `user:password` and `root:root-password`, which aren't great and will need changing after install.
+* The initial `install.yml` playbook isn't quite fully idempotent, which is generally considered bad Ansible practice. I've tried to control for this by adding checkpoints that write files into `/tmp` as we run through the playbook, recording which steps we've successfully run and making it easier to iterate on the playbook for development.
+* This setup uses `systemd`. There is no simple way to switch this to OpenRC, but I might consider it in the future.
 * There is no LSM active. There is an `eselect profile` with SELinux which I may attempt to use in the future.
-* This is also not Gentoo Hardened, but I will consider that `eselect profile` too.
-* You need at least 4GB RAM to build a proper system with GNOME. Once it gets to building bits like Webkit and Spidermonkey, it will happily shoot up to 4.5GB+ used. So really 8GB is a bare minimum for desktop Gentoo unless you want to be grinding swap all day.
-* This will take **ages** to run. No... seriously... **ages**. My development machine is admittedly showing its age now, but it takes well over 12 hours to finish a Packer run for this system. Interestingly, the majority of that time seems to be spent building Firefox.
+* This is also not Hardened Gentoo, but I will consider that `eselect profile` too.
+* You need at least 4GB RAM to build a proper system with GNOME. Once it gets to building bits like Webkit and Spidermonkey, it will happily shoot up to 4.5GB+ used. So really 8GB is a bare minimum for building a desktop based on Gentoo unless you want to be grinding swap all day.
+* This will probably take **ages** to run. Especially if you include the Firefox package. My development machine is admittedly showing its age now, but it takes about 12 hours to finish a Packer run for this system. (It's a **huge** amount faster when not building Firefox).
 
 ---
 
@@ -55,9 +55,6 @@ Anyway, as I'd hoped, I learned a lot from this project, and I can fully recomme
 * Packer
 * VirtualBox
 * Nothing listening on port `6666` already on your system (the VM will listen for SSH connections on this port while building).
-* An RSA key, generated and stored at `~/.ssh/id_rsa_Packer`
-  * This will be used for the second stage of the playbook run (post-install).
-  * You could generate with: `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
 
 ### Note on Packer and SSH client config
 If you experience an error where Ansible is unable to connect, then ensure your `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms and ciphers.
@@ -83,21 +80,20 @@ The Ansible provisioner for Packer passes `IdentitiesOnly=yes` to the `ansible-p
 
 ## Installing to a remote host over SSH
 
-### Pre-reqs
+### Pre-reqs (remote host)
+* Remote host, booted to the latest [Gentoo Minimal Installation CD](https://www.gentoo.org/downloads/).
+* An ethernet connection, up and capable of DHCP.
+* SSH, started and running on the Gentoo LiveCD:
+  * `/etc/init.d/sshd start`
+* A password set for the `root` account:
+  * `passwd root`
+  * If you use `root-password` as the password, this playbook will run without modification.
+
+### Pre-reqs (local host)
 * Ansible
-* Remote host, booted to the latest Gentoo LiveCD.
-* Local `inventory` file for Ansible to use.
-* An RSA key, generated and stored at `~/.ssh/id_rsa_Packer`
-  * This will be used for the second stage of the playbook run (post-install).
-  * You could generate with: `ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_Packer`
+* Local `inventory` file for Ansible to use configured to use the DHCP address of our remote server.
 * Edit the `group_vars/all/main.yml` file to set any variables which need setting.
   * In particular, `firmware_type` must be set to either `bios` or `efi`. Setting this wrong may leave your system unbootable or, more likely, the GRUB installation step will simply fail.
-* Set a root password on the booted LiveCD.
-  * If you use `root-password` as the password, nothing will need to be changed, otherwise you will need to update a few variables with the password you choose.
-* After install, change the LiveCD's `sshd_config` to allow `root` login with password:
-  * `PasswordAuthentication yes`
-  * `PermitRootLogin yes`
-* Start the SSH server.
 
 ### Invoke installation with Ansible
 Deploy the first stage of installation (targets the booted LiveCD) with:

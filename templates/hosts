@@ -1,2 +1,2 @@
-127.0.0.1  localhost.localdomain localhost
-{{ ansible_default_ipv4.address }} {{ gentoo_hostname }}.{{ domain }} {{ gentoo_hostname }}
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6

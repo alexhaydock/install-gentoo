@@ -1,0 +1,25 @@
+---
+# Kernel (genkernel) config
+# https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel
+
+- name: Check whether we've built a kernel yet
+  stat: path=/tmp/kernel_built
+  register: kernel_built
+
+- name: Emerge the correct installkernel for a regular boot system (i.e. not systemd-boot)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/installkernel-gentoo'
+  when:
+    - not kernel_built.stat.exists
+
+- name: Emerge distribution kernel (https://wiki.gentoo.org/wiki/Project:Distribution_Kernel)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/gentoo-kernel'
+  when:
+    - not kernel_built.stat.exists
+
+- name: Write state file to show this task has completed
+  file:
+    path: /tmp/kernel_built
+    state: touch
+  when:
+    - not kernel_built.stat.exists
+...

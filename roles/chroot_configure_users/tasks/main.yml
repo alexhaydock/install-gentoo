@@ -1,0 +1,4 @@
+---
+- name: 'Set root password to {{ root_password }}'
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; echo "root:{{ root_password }}" | /usr/sbin/chpasswd'
+...

@@ -1,10 +1,10 @@
-.PHONY: main postinstall nuke
+.PHONY: install postinstall nuke
 
-main:
-	ansible-playbook -i inventory install.yml -vvv --skip-tags "postinstall,desktop"
+install:
+	ansible-playbook -i inventory.ini install.yml -vvv
 
 postinstall:
-	ansible-playbook -i inventory postinstall.yml -vvv --tags "postinstall"
+	ansible-playbook -i inventory.ini postinstall.yml -vvv
 
 nuke:
 	-vagrant destroy

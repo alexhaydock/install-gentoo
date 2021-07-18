@@ -1,0 +1,24 @@
+---
+# See: https://wiki.gentoo.org/wiki/Profile_(Portage)
+
+- name: Check whether we've chosen our Portage profile yet
+  stat: path=/tmp/profile_chosen
+  register: profile_chosen
+
+- name: Select our Portage profile with eselect
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; eselect profile set {{ eselect_profile }}'
+  when:
+    - not profile_chosen.stat.exists
+
+- name: Update environment with env-update (new eselect profile)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; env-update'
+  when:
+    - not profile_chosen.stat.exists
+
+- name: Write state file to show this task has completed
+  file:
+    path: /tmp/profile_chosen
+    state: touch
+  when:
+    - not profile_chosen.stat.exists
+...

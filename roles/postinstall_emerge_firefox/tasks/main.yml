@@ -1,0 +1,7 @@
+---
+- name: Emerge Firefox (be prepared... this will take a LONG time)
+  portage:
+    package: www-client/firefox
+  tags:
+    - postinstall
+...

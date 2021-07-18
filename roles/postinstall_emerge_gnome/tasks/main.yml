@@ -1,0 +1,27 @@
+---
+- name: Install dbus
+  portage:
+    package: sys-apps/dbus
+  tags:
+    - desktop
+
+- name: Install GNOME
+  portage:
+    package: gnome-base/gnome-light
+  tags:
+    - desktop
+
+- name: Enable dbus
+  service:
+    name: dbus
+    enabled: true
+  tags:
+    - desktop
+
+- name: Enable GDM
+  service:
+    name: gdm
+    enabled: true
+  tags:
+    - desktop
+...

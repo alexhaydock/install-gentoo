@@ -1,0 +1,84 @@
+---
+- name: Check the remote host to see whether we've already configured the filesystems
+  stat: path=/tmp/filesystems_completed
+  register: filesystems_completed
+
+- name: Create main LVM group
+  lvg:
+    pvs: "{{ main_disk }}{{ data_part_no }}"
+    vg: "{{ vg_name }}"
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Create swap volume
+  lvol:
+    lv: swap
+    vg: "{{ vg_name }}"
+    size: "{{ swap_size }}"
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Format swap volume
+  command: "mkswap /dev/mapper/{{ vg_name }}-swap"
+  when:
+    - not filesystems_completed.stat.exists
+
+# This seems to be pretty critical as when I just had 4GB RAM I had some big builds like Spidermonkey
+# error out due to what appeared to be an OOM error:
+# https://stackoverflow.com/questions/37128813/installing-lxml-error-open-cfi-at-the-end-of-file-missing-cfi-endproc-direct
+- name: Enable swap now (it will help us build big things later!)
+  command: "swapon /dev/mapper/{{ vg_name }}-swap"
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Create root lvm volume group
+  lvol:
+    lv: root
+    vg: "{{ vg_name }}"
+    size: "{{ root_size }}"
+    shrink: false
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Format root volume
+  filesystem:
+    fstype: "{{ mainfstype }}"
+    dev: "/dev/mapper/{{ vg_name }}-root"
+    force: "{{ force_format }}"
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Create mountpoints
+  file:
+    path: /mnt/gentoo/boot
+    state: directory
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Mount /
+  mount:
+    path: /mnt/gentoo
+    src: /dev/mapper/{{ vg_name }}-root
+    fstab: /tmp/tmp_fstab
+    fstype: "{{ mainfstype }}"
+    state: mounted
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Mount /boot
+  mount:
+    path: /mnt/gentoo/boot
+    src: "{{ main_disk }}{{ boot_part_no }}"
+    fstab: /tmp/tmp_fstab
+    fstype: "vfat"
+    state: mounted
+  when:
+    - not filesystems_completed.stat.exists
+
+- name: Write state file to show this task has completed
+  file:
+    path: /tmp/filesystems_completed
+    state: touch
+  when:
+    - not filesystems_completed.stat.exists
+...

@@ -1,0 +1,37 @@
+---
+### GRUB ###
+- name: Configure grub defaults
+  copy:
+    src: grub_default
+    dest: /mnt/gentoo/etc/default/grub
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Install Grub to /boot (BIOS)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-install {{ main_disk }}'
+  when: firmware_type == 'bios'
+
+# Without the --target and --efi-directory specified here we get a "cannot find EFI directory" error
+# See: https://wiki.gentoo.org/wiki/GRUB2/Troubleshooting
+- name: Install Grub to /boot (EFI)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-install --target=x86_64-efi --efi-directory=/boot {{ main_disk }}'
+  when: firmware_type == 'efi'
+
+- name: Configure /boot/grub/grub.cfg
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; grub-mkconfig -o /boot/grub/grub.cfg'
+  args:
+    creates: /mnt/gentoo/boot/grub/grub.cfg
+
+### systemd-boot ###
+# - name: Write bootloader with systemd-boot (efivars need to be mounted but they should be automatically already)
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; bootctl install'
+
+### efibootmgr ###
+# - name: Work out newly-built kernel version (hack that just goes off the *running* version -- fix!)
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; uname -r | cut -d"-" -f1'
+#   register: kernelversion
+
+# - name: Write bootloader using efibootmgr
+#   command: chroot /mnt/gentoo bash -c 'source /etc/profile; efibootmgr --create --disk {{ main_disk }} --part 1 --label "Gentoo" --loader "\efi\boot\bootx64.efi" initrd="\initramfs-genkernel-amd64-{{ kernelversion.stdout }}-gentoo"'
+...

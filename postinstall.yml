@@ -1,14 +1,15 @@
 ---
-- hosts: default
+- hosts: gentoo
   name: Gentoo Stage3 Post-Install (Installed Environment)
   gather_facts: true
 
   roles:
-  # After the initial run, these actions are performed on the host directly.
-  # We can include or exclude them at playbook run time based on tags.
-  - role: postinstall-general
-  - role: packages
-  - role: docker
-  - role: gnome-desktop
-  - role: users
+    - postinstall_config
+    - postinstall_emerge_system_tools
+    - postinstall_emerge_gnome
+    - postinstall_emerge_flatpak
+    - postinstall_configure_users
+    # Disabled Docker/Firefox roles because they take forever to compile
+    # - postinstall_emerge_docker
+    # - postinstall_emerge_firefox
 ...

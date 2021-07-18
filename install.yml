@@ -1,70 +1,20 @@
 ---
-- hosts: default
+- hosts: gentoo
   name: Gentoo Stage3 Install (LiveCD Environment)
   gather_facts: true
 
-  pre_tasks:
-  - name: Show kernel version (pre-update)
-    command: uname -a
-    register: kernelpre
-    changed_when: false
-  - debug: msg="{{ kernelpre.stdout }}"
-
-  - name: Check time
-    command: date
-    register: datepre
-    changed_when: false
-  - debug: msg="{{ datepre.stdout }}"
-
-  - name: Run ntp sync in case we have restored a VM snapshot and the clock is wrong
-    command: ntpd -q -g
-    changed_when: false
-
-  - name: Check time again
-    command: date
-    register: datepost
-    changed_when: false
-  - debug: msg="{{ datepost.stdout }}"
-
-  - name: Check the remote host to see whether we've already configured the disks
-    stat: path=/tmp/disks_completed
-    register: disks_completed
-
-  - name: Check the remote host to see whether we've configured the filesystems
-    stat: path=/tmp/filesystems_completed
-    register: filesystems_completed
-
-  - name: Check the remote host to see whether we've already completed the stage3 step
-    stat: path=/tmp/stage3_completed
-    register: stage3_completed
-
-  - name: Check whether we've built a kernel yet
-    stat: path=/tmp/kernel_built
-    register: kernel_built
-
   roles:
-  - role: disk-layout
-    when: not disks_completed.stat.exists
-
-  - role: filesystems
-    when: not filesystems_completed.stat.exists
-
-  - role: stage3
-    when: not stage3_completed.stat.exists
-
-  - role: kernel
-    when: not kernel_built.stat.exists
-
-  - role: networking
-  - role: system
-  - role: bootloader
-  - role: packer-ssh-keys
-
-  post_tasks:
-  - name: Sync disks before ending playbook
-    command: sync
-
-  - name: Reboot
-    command: 'shutdown -r now'
-    changed_when: false
+    - chroot_pre_checks
+    - chroot_format_disks
+    - chroot_create_filesystems
+    - chroot_configure_stage3
+    - chroot_eselect_portage_profile
+    - chroot_emerge_kernel
+    - chroot_configure_networking
+    - chroot_emerge_world
+    - chroot_emerge_system_packages
+    - chroot_emerge_bootloader
+    - chroot_configure_users
+    - chroot_configure_ssh
+    - chroot_cleanup_and_reboot
 ...
