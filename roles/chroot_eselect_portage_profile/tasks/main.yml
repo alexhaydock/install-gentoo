@@ -2,7 +2,8 @@
 # See: https://wiki.gentoo.org/wiki/Profile_(Portage)
 
 - name: Check whether we've chosen our Portage profile yet
-  stat: path=/tmp/profile_chosen
+  stat:
+    path: /tmp/profile_chosen
   register: profile_chosen
 
 - name: Select our Portage profile with eselect
@@ -19,6 +20,9 @@
   file:
     path: /tmp/profile_chosen
     state: touch
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not profile_chosen.stat.exists
 ...

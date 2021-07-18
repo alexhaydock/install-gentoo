@@ -3,7 +3,8 @@
 # https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel
 
 - name: Check whether we've built a kernel yet
-  stat: path=/tmp/kernel_built
+  stat:
+    path: /tmp/kernel_built
   register: kernel_built
 
 - name: Emerge the correct installkernel for a regular boot system (i.e. not systemd-boot)
@@ -20,6 +21,9 @@
   file:
     path: /tmp/kernel_built
     state: touch
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not kernel_built.stat.exists
 ...

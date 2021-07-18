@@ -8,6 +8,9 @@
   copy:
     src: 50-dhcp.network
     dest: /mnt/gentoo/etc/systemd/network/50-dhcp.network
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Enable systemd-networkd on boot
   command: chroot /mnt/gentoo bash -c 'systemctl enable systemd-networkd'

@@ -84,6 +84,9 @@
   file:
     path: /tmp/disks_completed
     state: touch
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not disks_completed.stat.exists
 ...

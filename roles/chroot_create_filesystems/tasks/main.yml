@@ -1,6 +1,7 @@
 ---
 - name: Check the remote host to see whether we've already configured the filesystems
-  stat: path=/tmp/filesystems_completed
+  stat:
+    path: /tmp/filesystems_completed
   register: filesystems_completed
 
 - name: Create main LVM group
@@ -79,6 +80,9 @@
   file:
     path: /tmp/filesystems_completed
     state: touch
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not filesystems_completed.stat.exists
 ...

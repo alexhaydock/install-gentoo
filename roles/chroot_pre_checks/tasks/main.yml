@@ -3,13 +3,17 @@
   command: uname -a
   register: kernelpre
   changed_when: false
-- debug: msg="{{ kernelpre.stdout }}"
+
+- name: Print kernel version
+  debug: msg="{{ kernelpre.stdout }}"
 
 - name: Check time
   command: date
   register: datepre
   changed_when: false
-- debug: msg="{{ datepre.stdout }}"
+
+- name: Display time before sync
+  debug: msg="{{ datepre.stdout }}"
 
 - name: Run NTP sync (in case we have restored a VM snapshot and the clock is wrong)
   command: ntpd -q -g
@@ -20,5 +24,7 @@
   command: date
   register: datepost
   changed_when: false
-- debug: msg="{{ datepost.stdout }}"
+
+- name: Display time now
+  debug: msg="{{ datepost.stdout }}"
 ...

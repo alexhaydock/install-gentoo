@@ -4,14 +4,17 @@
 # https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base
 
 - name: Check the remote host to see whether we've already completed the stage3 step
-  stat: path=/tmp/stage3_completed
+  stat:
+    path: /tmp/stage3_completed
   register: stage3_completed
 
 - name: Copy Over Stage Retrieval Script
   template:
     src: get_stage.sh
     dest: /mnt/gentoo/
-    mode: 0755
+    owner: root
+    group: root
+    mode: '0755'
   when:
     - not stage3_completed.stat.exists
 
@@ -106,6 +109,9 @@
   template:
     src: hosts
     dest: /mnt/gentoo/etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not stage3_completed.stat.exists
 
@@ -113,6 +119,9 @@
   template:
     src: fstab
     dest: /mnt/gentoo/etc/fstab
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not stage3_completed.stat.exists
 
@@ -120,16 +129,25 @@
   template:
     src: make.conf
     dest: /mnt/gentoo/etc/portage/make.conf
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Create /etc/portage/package.use (idempotent, runs even if we've run this role before)
   copy:
     src: package.use
     dest: /mnt/gentoo/etc/portage/package.use
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Copy locale.gen over to configure the supported locales for the system
   copy:
     src: locale.gen
     dest: /etc/locale.gen
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not stage3_completed.stat.exists
 
@@ -142,6 +160,9 @@
   copy:
     src: 02locale
     dest: /etc/env.d/02locale
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not stage3_completed.stat.exists
 
@@ -152,6 +173,9 @@
   file:
     path: /tmp/stage3_completed
     state: touch
+    owner: root
+    group: root
+    mode: '0644'
   when:
     - not stage3_completed.stat.exists
 ...
