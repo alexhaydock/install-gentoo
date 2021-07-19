@@ -4,6 +4,7 @@
     package: '{{ item }}'
   with_items:
     - app-admin/sudo
+    - app-misc/neofetch  # Critically important for those sweet sweet internet points
     - app-misc/tmux
     - dev-python/pip
     - dev-vcs/git

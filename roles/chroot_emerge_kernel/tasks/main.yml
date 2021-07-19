@@ -7,13 +7,32 @@
     path: /tmp/kernel_built
   register: kernel_built
 
-- name: Emerge the correct installkernel for a regular boot system (i.e. not systemd-boot)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/installkernel-gentoo'
+- name: Emerge sys-kernel/gentoo-sources
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/gentoo-sources'
+  args:
+    creates: /mnt/gentoo/usr/src/linux/arch
   when:
     - not kernel_built.stat.exists
 
-- name: Emerge distribution kernel (https://wiki.gentoo.org/wiki/Project:Distribution_Kernel)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/gentoo-kernel'
+- name: Emerge sys-kernel/genkernel (this step does not actually build the kernel yet, just installs the kernel-building tool and dependencies like linux-firmware)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel'
+  args:
+    creates: /mnt/gentoo/usr/bin/genkernel
+  when:
+    - not kernel_built.stat.exists
+
+- name: Select the default Genkernel kernel so we have a build target for 'genkernel all'
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; eselect kernel set 1'
+  when:
+    - not kernel_built.stat.exists
+
+- name: Build Kernel using 'genkernel all'
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel all'
+  when:
+    - not kernel_built.stat.exists
+
+- name: Build and install initramfs with LVM support
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel --lvm --install initramfs'
   when:
     - not kernel_built.stat.exists
 

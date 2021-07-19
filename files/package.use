@@ -29,3 +29,6 @@ dev-db/sqlite secure-delete
 # Required to sort circular dependency issue
 # See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
 media-libs/freetype harfbuzz
+
+# Required for neofetch
+www-client/w3m imlib

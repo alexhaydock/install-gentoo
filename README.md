@@ -56,16 +56,6 @@ Anyway, as I'd hoped, I learned a lot from this project, and I can fully recomme
 * VirtualBox
 * Nothing listening on port `6666` already on your system (the VM will listen for SSH connections on this port while building).
 
-### Note on Packer and SSH client config
-If you experience an error where Ansible is unable to connect, then ensure your `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms and ciphers.
-
-A resonable `~/.ssh/config` snippet for this:
-```
-Host 127.0.0.1
-    HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,ssh-rsa,ssh-dss
-    Ciphers chacha20-poly1305@openssh.com,aes128-ctr,aes256-ctr
-```
-
 ### Building a VM with Packer
 ```sh
 packer build -on-error=ask packer.json
@@ -105,3 +95,22 @@ and then, once the system is installed and the remote host has rebooted:
 ```sh
 make postinstall
 ```
+
+---
+
+## Troubleshooting
+
+### Note on Packer and SSH client config
+If you experience an error where Ansible is unable to connect, then ensure your `~/.ssh/config` is not too restrictive when it comes to key exchange algorithms and ciphers.
+
+A resonable `~/.ssh/config` snippet for this:
+```
+Host 127.0.0.1
+    HostKeyAlgorithms ssh-ed25519-cert-v01@openssh.com,ssh-ed25519,ssh-rsa,ssh-dss
+    Ciphers chacha20-poly1305@openssh.com,aes128-ctr,aes256-ctr
+```
+
+### A note on "Distribution Kernels"
+I experimented briefly with using a ["Distribution Kernel"](https://wiki.gentoo.org/wiki/Project:Distribution_Kernel) to simplify the deployment process here. This automates a bunch of steps including building the `initramfs` that the bootloader hands off to. Unfortunately, it seems like the default config used by `sys-kernel/gentoo-kernel` when building the initramfs does not include LVM support.
+
+Instead of taking the Distribution Kernel approach, we instead use [Genkernel](https://wiki.gentoo.org/wiki/Genkernel) and build our `initramfs` using `genkernel --lvm --install initramfs`, which builds with LVM support and allows us to boot to a disk that is partitioned using LVM.

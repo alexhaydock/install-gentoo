@@ -1,7 +1,7 @@
 ---
 # For some reason the python2.7 emerge (dependency of something else) breaks if we don't remount /dev before emerging it
 # See: https://forums.gentoo.org/viewtopic-t-982100-start-0.html
-- name: Remount /dev to get /dev/mapper visible (otherwise emerging python2.7 breaks)
+- name: Remount /dev to make sure /dev/mapper is visible (otherwise emerging python2.7 breaks later on)
   command: mount --rbind /dev /mnt/gentoo/dev
   args:
     warn: false
@@ -19,7 +19,7 @@
     creates: /mnt/gentoo/usr/sbin/syslog-ng
 
 - name: Enable syslog-ng systemd service
-  command: chroot /mnt/gentoo bash -c 'systemctl enable syslog-ng@default'
+  command: chroot /mnt/gentoo bash -c 'systemctl enable syslog-ng@default.service'
 
 - name: Emerge sys-process/cronie (for scheduling with cron)
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-process/cronie'
@@ -27,7 +27,7 @@
     creates: /mnt/gentoo/etc/init.d/cronie
 
 - name: Enable cronie systemd service
-  command: chroot /mnt/gentoo bash -c 'systemctl enable cronie'
+  command: chroot /mnt/gentoo bash -c 'systemctl enable cronie.service'
 
 - name: Emerge sys-boot/grub (The --deep flag is recommended on this page https://wiki.gentoo.org/wiki/GRUB2#Emerge)
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --deep sys-boot/grub'
@@ -38,4 +38,20 @@
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-portage/gentoolkit'
   args:
     creates: /mnt/gentoo/usr/bin/equery
+
+- name: Emerge sys-fs/lvm2 (needed to provide LVM utilities in the installed system)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-fs/lvm2'
+  args:
+    creates: /mnt/gentoo/usr/sbin/lvm
+
+# Without this service running in the installed system, it won't be able to automatically
+# map our LVM volumes to /dev/mapper and the boot process won't be able to find our swap
+# partition at /dev/mapper/main-swap, causing a 1m30s boot delay while mounting times out.
+- name: Enable lvm2-monitor systemd service
+  command: chroot /mnt/gentoo bash -c 'systemctl enable lvm2-monitor.service'
+
+- name: Emerge sys-fs/xfsprogs (needed to provide utilities if we're using XFS as our filesystem)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-fs/xfsprogs'
+  args:
+    creates: /mnt/gentoo/usr/sbin/xfs_repair
 ...

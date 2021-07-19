@@ -31,9 +31,10 @@
   when:
     - not stage3_completed.stat.exists
 
-# Both ansible_lint and Ansible complain about these commands as we're not using
-# the native 'mount' module, but this seems easier for now since we're mounting
-# for the chroot.
+# We run the /proc /dev/ and /sys bind mount commands whether or not
+# we have already run this playbook role. Without making sure the relevant
+# system dirs are mounted into the chroot we can't do stuff like grub-mkconfig
+# and other things that rely on /dev and similar system dirs.
 - name: proc bind mounts
   command: mount -t proc proc /mnt/gentoo/proc
   args:
@@ -41,8 +42,6 @@
     warn: false
   tags:
   - skip_ansible_lint
-  when:
-    - not stage3_completed.stat.exists
 
 - name: dev bind mounts
   command: mount --rbind /dev /mnt/gentoo/dev
@@ -51,8 +50,6 @@
     warn: false
   tags:
   - skip_ansible_lint
-  when:
-    - not stage3_completed.stat.exists
 
 - name: sys bind mounts
   command: mount --rbind /sys /mnt/gentoo/sys
@@ -61,8 +58,6 @@
     warn: false
   tags:
   - skip_ansible_lint
-  when:
-    - not stage3_completed.stat.exists
 
 - name: Cleanup Stage3 Archive
   file:
