@@ -35,6 +35,5 @@ swap_size: 4096m
 vg_name: '{{ gentoo_hostname }}'
 
 # Configure eselect profile here
-# TODO: Is this deprecated by deprecation of kernel-genkernel-old?
 eselect_profile: 'default/linux/amd64/17.1/desktop/gnome/systemd'
 ...

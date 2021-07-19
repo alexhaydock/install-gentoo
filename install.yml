@@ -11,9 +11,9 @@
     - chroot_eselect_portage_profile
     - chroot_emerge_kernel
     - chroot_configure_networking
-    - chroot_emerge_world
     - chroot_emerge_system_packages
     - chroot_emerge_bootloader
+    - chroot_emerge_world
     - chroot_configure_users
     - chroot_configure_ssh
     - chroot_cleanup_and_reboot

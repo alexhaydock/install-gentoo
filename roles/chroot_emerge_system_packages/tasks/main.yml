@@ -8,6 +8,11 @@
   tags:
     - skip_ansible_lint
 
+- name: Emerge dev-util/glib-utils (seems to be a dep for other packages when we rebuild @world later - particularly for app-crypt/libsecret)
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge dev-util/glib-utils'
+  args:
+    creates: /mnt/gentoo/usr/bin/glib-mkenums  # This is the missing binary when we try and re-emerge libsecret without glib-utils.
+
 - name: Emerge app-admin/syslog-ng (for logging)
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-admin/syslog-ng'
   args:
