@@ -1,4 +1,34 @@
 ---
+- name: Copy package.use
+  copy:
+    src: package.use
+    dest: /etc/portage/package.use
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - postinstall
+
+- name: Copy package.accept_keywords
+  copy:
+    src: package.accept_keywords
+    dest: /etc/portage/package.accept_keywords
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - postinstall
+
+- name: Copy make.conf
+  template:
+    src: make.conf
+    dest: /etc/portage/make.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - postinstall
+
 - name: Enable systemd-timesyncd for NTP
   service:
     name: systemd-timesyncd

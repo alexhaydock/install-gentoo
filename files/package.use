@@ -32,3 +32,6 @@ media-libs/freetype harfbuzz
 
 # Required for neofetch
 www-client/w3m imlib
+
+# Required for Below
+dev-lang/rust rustfmt

@@ -13,14 +13,14 @@
 
 - name: Enable dbus
   service:
-    name: dbus
+    name: dbus.service
     enabled: true
   tags:
     - desktop
 
 - name: Enable GDM
   service:
-    name: gdm
+    name: gdm.service
     enabled: true
   tags:
     - desktop

@@ -17,7 +17,7 @@ gentoo_hostname: gentoo
 timezone: Europe/London
 
 # Configure our package mirror
-mirror: "{{ mirror_baseurl | default('https://www.mirrorservice.org')/sites/distfiles.gentoo.org"
+mirror: "{{ mirror_baseurl | default('https://www.mirrorservice.org')}}/sites/distfiles.gentoo.org"
 
 # Configure networking
 domain: localdomain
