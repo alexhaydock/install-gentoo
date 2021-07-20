@@ -1,5 +1,5 @@
 # Enable testing for Below on amd64
 sys-process/below ~amd64
 
-# Enable testing for libbpf
+# Enable testing for libbpf on amd64
 dev-libs/libbpf ~amd64

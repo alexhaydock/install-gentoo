@@ -35,3 +35,6 @@ www-client/w3m imlib
 
 # Required for Below
 dev-lang/rust rustfmt
+
+# Required for building GNOME
+dev-libs/libgdata vala
