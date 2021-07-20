@@ -38,3 +38,6 @@ dev-lang/rust rustfmt
 
 # Required for building GNOME
 dev-libs/libgdata vala
+
+# Required for building Flatpak
+dev-util/ostree curl
