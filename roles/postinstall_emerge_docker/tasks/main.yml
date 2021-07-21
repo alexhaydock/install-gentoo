@@ -1,6 +1,4 @@
 ---
-# docker-py is the package we need for the docker_image and docker_container modules we're going
-# to use further down this role.
 - name: Install Docker
   portage:
     package: '{{ item }}'
@@ -15,47 +13,6 @@
     name: docker
     enabled: true
     state: started
-  tags:
-    - postinstall
-
-- name: Create /root/dwk
-  file:
-    path: /root/dwk
-    state: directory
-  tags:
-    - postinstall
-
-- name: Copy Dockerfile over
-  copy:
-    src: Dockerfile
-    dest: /root/dwk/Dockerfile
-  tags:
-    - postinstall
-
-- name: Copy nginx.conf over
-  copy:
-    src: nginx.conf
-    dest: /root/dwk/nginx.conf
-  tags:
-    - postinstall
-
-- name: Build dwk container
-  docker_image:
-    name: dwk
-    build:
-      path: /root/dwk
-    source: build
-  tags:
-     - postinstall
-
-- name: Launch container
-  docker_container:
-    name: darkwebkittens.xyz
-    image: dwk
-    state: started
-    restart: true
-    ports:
-      - "80:80/tcp"
   tags:
     - postinstall
 ...

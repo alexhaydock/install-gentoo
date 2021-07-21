@@ -9,7 +9,6 @@
     - postinstall_emerge_gnome
     - postinstall_emerge_flatpak
     - postinstall_configure_users
-    # Disabled Docker/Firefox roles because they take forever to compile
-    # - postinstall_emerge_docker
-    # - postinstall_emerge_firefox
+    - postinstall_emerge_docker
+    - postinstall_emerge_firefox
 ...
