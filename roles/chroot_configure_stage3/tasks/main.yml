@@ -136,14 +136,6 @@
     group: root
     mode: '0644'
 
-- name: Create /etc/portage/package.accept_keywords (idempotent, runs even if we've run this role before)
-  copy:
-    src: package.accept_keywords
-    dest: /mnt/gentoo/etc/portage/package.accept_keywords
-    owner: root
-    group: root
-    mode: '0644'
-
 - name: Copy locale.gen over to configure the supported locales for the system
   copy:
     src: locale.gen
