@@ -59,4 +59,7 @@
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge net-misc/networkmanager'
   args:
     creates: /mnt/gentoo/usr/bin/nmtui
+
+- name: Enable NetworkManager systemd service
+  command: chroot /mnt/gentoo bash -c 'systemctl enable NetworkManager.service'
 ...
