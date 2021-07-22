@@ -9,6 +9,7 @@
     - app-misc/tmux
     - dev-python/pip
     - dev-vcs/git
+    - sys-apps/gnome-disk-utility
     - sys-process/htop
   tags:
     - postinstall
