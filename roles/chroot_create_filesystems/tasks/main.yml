@@ -6,7 +6,7 @@
 
 - name: Create main LVM group
   lvg:
-    pvs: "{{ main_disk }}{{ data_part_no }}"
+    pvs: "{{ main_disk }}{{ '3' if firmware_type == 'bios' else '2' }}"
     vg: "{{ vg_name }}"
   when:
     - not filesystems_completed.stat.exists
@@ -69,7 +69,7 @@
 - name: Mount /boot
   mount:
     path: /mnt/gentoo/boot
-    src: "{{ main_disk }}{{ boot_part_no }}"
+    src: "{{ main_disk }}{{ '2' if firmware_type == 'bios' else '1' }}"
     fstab: /tmp/tmp_fstab
     fstype: "vfat"
     state: mounted
