@@ -10,6 +10,7 @@
     - dev-python/pip
     - dev-vcs/git
     - sys-apps/gnome-disk-utility
+    - sys-kernel/dracut  # We don't actually want to use Dracut to build our initramfs but it provides the 'lsinitrd' command which lets us inspect the contents of one
     - sys-process/htop
   tags:
     - postinstall
