@@ -35,8 +35,8 @@ swap_size: 4096m
 vg_name: '{{ gentoo_hostname }}'
 
 # Auto-calculate boot and root partition offsets
-boot_id: '{{ '2' if firmware_type == 'bios' else '1' }}'
-root_id: '{{ '3' if firmware_type == 'bios' else '2' }}'
+boot_id: "{{ '2' if firmware_type == 'bios' else '1' }}"
+root_id: "{{ '3' if firmware_type == 'bios' else '2' }}"
 boot_partition: '{{ main_disk }}{{ boot_id }}'
 root_partition: '{{ main_disk }}{{ root_id }}'
 
