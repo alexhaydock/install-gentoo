@@ -4,9 +4,18 @@
     path: /tmp/filesystems_completed
   register: filesystems_completed
 
+- name: Format /boot Partition
+  filesystem:
+    fstype: "vfat"
+    dev: "{{ boot_partition }}"
+    force: "{{ force_format }}"
+    opts: "-F 32"
+  when:
+    - not filesystems_completed.stat.exists
+
 - name: Create main LVM group
   lvg:
-    pvs: "{{ main_disk }}{{ '3' if firmware_type == 'bios' else '2' }}"
+    pvs: "{{ root_partition }}"
     vg: "{{ vg_name }}"
   when:
     - not filesystems_completed.stat.exists
@@ -69,7 +78,7 @@
 - name: Mount /boot
   mount:
     path: /mnt/gentoo/boot
-    src: "{{ main_disk }}{{ '2' if firmware_type == 'bios' else '1' }}"
+    src: "{{ boot_partition }}"
     fstab: /tmp/tmp_fstab
     fstype: "vfat"
     state: mounted

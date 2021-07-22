@@ -5,7 +5,7 @@
 
   roles:
     - chroot_pre_checks
-    - chroot_format_disks
+    - chroot_partition_disks
     - chroot_create_filesystems
     - chroot_configure_stage3
     - chroot_eselect_portage_profile

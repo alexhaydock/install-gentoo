@@ -1,3 +1,3 @@
 /dev/mapper/main-root	/		xfs	defaults		0 0
-{{ main_disk }}{{ boot_part_no }}		/boot		vfat	defaults	0 0
+{{ boot_partition }}		/boot		vfat	defaults	0 0
 /dev/mapper/main-swap	none		swap	sw		0 0

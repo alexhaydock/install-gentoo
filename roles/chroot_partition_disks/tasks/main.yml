@@ -7,7 +7,7 @@
     path: /tmp/disks_completed
   register: disks_completed
 
-- name: Make Partition Labels
+- name: "Make GPT label on {{ main_disk }}"
   command: "parted -s {{ main_disk }} mklabel gpt"
   when:
     - not disks_completed.stat.exists
@@ -32,7 +32,7 @@
 - name: Create /boot partition
   parted:
     device: "{{ main_disk }}"
-    number: "{{ '2' if firmware_type == 'bios' else '1' }}"
+    number: "{{ boot_id }}"
     part_start: "{{ '4MiB' if firmware_type == 'bios' else '0%' }}"
     part_end: '1GiB'
     flags: ["esp"]
@@ -41,19 +41,10 @@
   when:
     - not disks_completed.stat.exists
 
-- name: Format /boot Partition
-  filesystem:
-    fstype: "vfat"
-    dev: "{{ main_disk }}{{ '2' if firmware_type == 'bios' else '1' }}"
-    force: "{{ force_format }}"
-    opts: "-F 32"
-  when:
-    - not disks_completed.stat.exists
-
 - name: Create main data partition for our LVM container
   parted:
     device: "{{ main_disk }}"
-    number: "{{ '3' if firmware_type == 'bios' else '2' }}"
+    number: "{{ root_id }}"
     part_start: '1GiB'
     flags: ["lvm"]
     state: present
