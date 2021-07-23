@@ -1,0 +1,13 @@
+---
+# There's an issue that seems to present itself when emerging @world on a fresh
+# systemd/gnome eselect profile.
+#
+# The freetype package depends on harfbuzz during normal circumstances, but harfbuzz
+# depends on freetype. So the solution here is to build freetype temporarily with
+# a USE flag that disables harfbuzz. This lets us build freetype which then lets us build
+# harfbuzz which then lets us rebuild freetype with harfbuzz later on when we re-emerge @world.
+#
+# See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
+- name: Emerge freetype with harfbuzz support disabled to resolve circular dependency when emerging @world
+  command: chroot /mnt/gentoo bash -c 'source /etc/profile; USE="-harfbuzz" emerge media-libs/freetype'
+...

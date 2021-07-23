@@ -18,8 +18,9 @@ sys-boot/grub -themes -truetype
 # because it is a local flag for this package, or it needs to be set locally for some reason.
 dev-libs/openssl -bindist
 
-# Required to sort circular dependency issue
-# See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
+# Build freetype with harfbuzz support
+# (Required to sort circular dependency issue)
+# See also the chroot_harfbuzz_circular_dep role
 media-libs/freetype harfbuzz
 
 # Firefox

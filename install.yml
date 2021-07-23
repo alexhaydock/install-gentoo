@@ -11,6 +11,7 @@
     - chroot_system_config
     - chroot_eselect_portage_profile
     - chroot_remount_dev
+    - chroot_harfbuzz_circular_dep
     - chroot_emerge_world
     - chroot_emerge_kernel
     - chroot_configure_networking
