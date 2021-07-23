@@ -1,13 +1,4 @@
 ---
-# For some reason the python2.7 emerge (dependency of something else) breaks if we don't remount /dev before emerging it
-# See: https://forums.gentoo.org/viewtopic-t-982100-start-0.html
-- name: Remount /dev to make sure /dev/mapper is visible (otherwise emerging python2.7 breaks later on)
-  command: mount --rbind /dev /mnt/gentoo/dev
-  args:
-    warn: false
-  tags:
-    - skip_ansible_lint
-
 - name: Emerge dev-util/glib-utils (seems to be a dep for other packages when we rebuild @world later - particularly for app-crypt/libsecret)
   command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge dev-util/glib-utils'
   args:

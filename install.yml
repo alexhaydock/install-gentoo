@@ -8,12 +8,14 @@
     - chroot_partition_disks
     - chroot_create_filesystems
     - chroot_configure_stage3
+    - chroot_system_config
     - chroot_eselect_portage_profile
+    - chroot_remount_dev
+    - chroot_emerge_world
     - chroot_emerge_kernel
     - chroot_configure_networking
     - chroot_emerge_system_packages
     - chroot_emerge_bootloader
-    - chroot_emerge_world
     - chroot_configure_users
     - chroot_configure_ssh
     - chroot_cleanup_and_reboot
