@@ -3,10 +3,6 @@
 #   emerge --verbose --update --changed-use --deep @world
 #
 
-# For the time being we need to disable cgroups v2 so we can install Docker
-# NOTE (Jul 2021): I have since disabled this. We want cgroups v2.
-#sys-apps/systemd cgroup-hybrid
-
 # Install firmware when using genkernel
 sys-kernel/genkernel firmware
 
@@ -22,22 +18,22 @@ sys-boot/grub -themes -truetype
 # because it is a local flag for this package, or it needs to be set locally for some reason.
 dev-libs/openssl -bindist
 
-# Required flags for bulding Firefox
-media-libs/libvpx postproc
-dev-db/sqlite secure-delete
-
 # Required to sort circular dependency issue
 # See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
 media-libs/freetype -harfbuzz
 
-# Required for neofetch
+# Firefox
+media-libs/libvpx postproc
+dev-db/sqlite secure-delete
+
+# Neofetch
 www-client/w3m imlib
 
-# Required for Below
+# Below
 dev-lang/rust rustfmt
 
-# Required for building GNOME
+# GNOME
 dev-libs/libgdata vala
 
-# Required for building Flatpak
+# Flatpak
 dev-util/ostree curl
