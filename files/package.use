@@ -20,7 +20,7 @@ dev-libs/openssl -bindist
 
 # Required to sort circular dependency issue
 # See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
-media-libs/freetype -harfbuzz
+media-libs/freetype harfbuzz
 
 # Firefox
 media-libs/libvpx postproc
