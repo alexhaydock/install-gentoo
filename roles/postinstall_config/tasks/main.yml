@@ -30,14 +30,4 @@
   command: hostnamectl set-hostname {{ gentoo_hostname }}
   tags:
     - desktop
-
-- name: Allow wheel group sudo access (validates sudoers file before saving)
-  lineinfile:
-    path: /etc/sudoers
-    state: present
-    regexp: '^%wheel ALL='
-    line: '%wheel ALL=(ALL) ALL'
-    validate: /usr/sbin/visudo -cf %s
-  tags:
-    - postinstall
 ...

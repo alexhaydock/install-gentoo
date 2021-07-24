@@ -8,7 +8,7 @@
     - postinstall_emerge_system_tools
     - postinstall_emerge_gnome
     - postinstall_emerge_flatpak
-    - postinstall_configure_users
     - postinstall_emerge_docker
     - postinstall_emerge_firefox
+    - postinstall_configure_users
 ...
