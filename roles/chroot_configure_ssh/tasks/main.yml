@@ -1,13 +1,13 @@
 ---
 - name: Permit root login for SSH on installed system
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /mnt/gentoo/etc/ssh/sshd_config
     regexp: '^PermitRootLogin'
     line: 'PermitRootLogin yes'
     state: present
 
 - name: Permit password-based login for SSH on installed system
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /mnt/gentoo/etc/ssh/sshd_config
     regexp: '^PasswordAuthentication'
     line: 'PasswordAuthentication yes'

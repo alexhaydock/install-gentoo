@@ -4,12 +4,12 @@
 # https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base
 
 - name: Check the remote host to see whether we've already completed the stage3 step
-  stat:
+  ansible.builtin.stat:
     path: /tmp/stage3_completed
   register: stage3_completed
 
 - name: Copy Over Stage Retrieval Script
-  template:
+  ansible.builtin.template:
     src: get_stage.sh
     dest: /mnt/gentoo/
     owner: root
@@ -19,12 +19,12 @@
     - not stage3_completed.stat.exists
 
 - name: Download Stage3 Tarball
-  command: /mnt/gentoo/get_stage.sh chdir=/mnt/gentoo
+  ansible.builtin.command: /mnt/gentoo/get_stage.sh chdir=/mnt/gentoo
   when:
     - not stage3_completed.stat.exists
 
 - name: Unarchive Stage3 Tarball
-  unarchive:
+  ansible.builtin.unarchive:
     src: /mnt/gentoo/stage3.tar.bz2
     dest: /mnt/gentoo/
     remote_src: true
@@ -36,67 +36,64 @@
 # system dirs are mounted into the chroot we can't do stuff like grub-mkconfig
 # and other things that rely on /dev and similar system dirs.
 - name: proc bind mounts
-  command: mount -t proc proc /mnt/gentoo/proc
+  ansible.builtin.command: mount -t proc proc /mnt/gentoo/proc
   args:
     creates: /mnt/gentoo/proc/zoneinfo
-    warn: false
   tags:
   - skip_ansible_lint
 
 - name: dev bind mounts
-  command: mount --rbind /dev /mnt/gentoo/dev
+  ansible.builtin.command: mount --rbind /dev /mnt/gentoo/dev
   args:
     creates: /mnt/gentoo/dev/zero
-    warn: false
   tags:
   - skip_ansible_lint
 
 - name: sys bind mounts
-  command: mount --rbind /sys /mnt/gentoo/sys
+  ansible.builtin.command: mount --rbind /sys /mnt/gentoo/sys
   args:
     creates: /mnt/gentoo/sys/dev
-    warn: false
   tags:
   - skip_ansible_lint
 
 - name: Cleanup Stage3 Archive
-  file:
+  ansible.builtin.file:
     path: /mnt/gentoo/stage3.tar.bz2
     state: absent
   when:
     - not stage3_completed.stat.exists
 
 - name: Cleanup get_stage.sh
-  file:
+  ansible.builtin.file:
     path: /mnt/gentoo/get_stage.sh
     state: absent
   when:
     - not stage3_completed.stat.exists
 
 - name: copy resolv.conf
-  command: cp -L /etc/resolv.conf /mnt/gentoo/etc/ creates=/mnt/gentoo/etc/resolv.conf
+  ansible.builtin.command: cp -L /etc/resolv.conf /mnt/gentoo/etc/ creates=/mnt/gentoo/etc/resolv.conf
   when:
     - not stage3_completed.stat.exists
 
 - name: create portage directory
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; mkdir /usr/portage' creates=/mnt/gentoo/usr/portage
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; mkdir /usr/portage' creates=/mnt/gentoo/usr/portage
   when:
     - not stage3_completed.stat.exists
 
 - name: Install ebuild repo snapshot
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; /usr/bin/emerge-webrsync' creates=/mnt/gentoo/usr/portage/xfce-extra
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; /usr/bin/emerge-webrsync' creates=/mnt/gentoo/usr/portage/xfce-extra
   when:
     - not stage3_completed.stat.exists
 
 # This shouldn't really be necessary as per the Gentoo Handbook, but 'eselect profile list' was just showing
 # up no profiles at all without it.
 - name: Update ebuild repo
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; /usr/bin/emerge --sync'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; /usr/bin/emerge --sync'
   when:
     - not stage3_completed.stat.exists
 
 - name: Write state file to show this task has completed
-  file:
+  ansible.builtin.file:
     path: /tmp/stage3_completed
     state: touch
     owner: root

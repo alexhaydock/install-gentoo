@@ -10,20 +10,14 @@ ansible_pass: "{{ root_password }}"
 ansible_ssh_pass: "{{ root_password }}"
 
 # Configure our boot firmware type (acceptable values for firmware_type are 'bios' or 'efi')
-firmware_type: 'bios'
+firmware_type: 'efi'
 
 # Configure installed system options
 gentoo_hostname: gentoo
 timezone: Europe/London
 
 # Configure our package mirror
-mirror: "{{ mirror_baseurl | default('https://www.mirrorservice.org')}}/sites/distfiles.gentoo.org"
-
-# Configure networking
-domain: localdomain
-management_interface: "{{ ansible_default_ipv4.interface }}"
-gateway: "{{ ansible_default_ipv4.gateway }}"
-netmask: "{{ ansible_default_ipv4.netmask }}"
+mirror: "https://www.mirrorservice.org/sites/distfiles.gentoo.org"
 
 # Configure disk layout
 # Note: If testing in libvirt/QEMU then be aware that the main disk will turn up as /dev/vda
@@ -41,5 +35,7 @@ boot_partition: '{{ main_disk }}{{ boot_id }}'
 root_partition: '{{ main_disk }}{{ root_id }}'
 
 # Configure eselect profile here
-eselect_profile: 'default/linux/amd64/17.1/desktop/gnome/systemd'
+# See:
+#   https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base#Choosing_the_right_profile
+eselect_profile: 'default/linux/amd64/23.0/desktop/gnome/systemd'
 ...

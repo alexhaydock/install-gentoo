@@ -1,20 +1,20 @@
 ---
-- name: Management Interface Configuration
-  command: chroot /mnt/gentoo bash -c "cd /etc/init.d; ln -s net.lo net.{{ management_interface }}"
+- name: Enable the same NIC we're using to install as the primary NIC in the booted system
+  ansible.builtin.command: chroot /mnt/gentoo bash -c "cd /etc/init.d; ln -s net.lo net.{{ ansible_default_ipv4.interface }}"
   args:
-    creates: "/mnt/gentoo/etc/init.d/net.{{ management_interface }}"
+    creates: "/mnt/gentoo/etc/init.d/net.{{ ansible_default_ipv4.interface }}"
 
-- name: Add systemd-networkd config that tells it to use DHCP for basically any network
-  copy:
-    src: 50-dhcp.network
-    dest: /mnt/gentoo/etc/systemd/network/50-dhcp.network
+- name: Add systemd-networkd config that tells it to use DHCP & SLAAC for basically any network
+  ansible.builtin.copy:
+    src: 10-default.network
+    dest: /mnt/gentoo/etc/systemd/network/10-default.network
     owner: root
     group: root
     mode: '0644'
 
 - name: Enable systemd-networkd on boot
-  command: chroot /mnt/gentoo bash -c 'systemctl enable systemd-networkd'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'systemctl enable systemd-networkd'
 
 - name: Enable sshd with systemd
-  command: chroot /mnt/gentoo bash -c 'systemctl enable sshd'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'systemctl enable sshd'
 ...

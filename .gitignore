@@ -1,6 +1,0 @@
-.DS_Store
-.vagrant/
-packer_cache/
-packer_output/
-vagrant_output/
-Vagrantfile

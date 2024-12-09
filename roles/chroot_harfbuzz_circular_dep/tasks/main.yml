@@ -9,5 +9,5 @@
 #
 # See: https://forums.gentoo.org/viewtopic-t-1138672-postdays-0-postorder-asc-start-25.html
 - name: Emerge freetype with harfbuzz support disabled to resolve circular dependency when emerging @world
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; USE="-harfbuzz" emerge media-libs/freetype'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; USE="-harfbuzz" emerge media-libs/freetype'
 ...

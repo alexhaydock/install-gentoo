@@ -1,6 +1,6 @@
 ---
 - name: Copy package.use
-  copy:
+  ansible.builtin.copy:
     src: package.use
     dest: /etc/portage/package.use
     owner: root
@@ -10,7 +10,7 @@
     - postinstall
 
 - name: Copy make.conf
-  template:
+  ansible.builtin.template:
     src: make.conf
     dest: /etc/portage/make.conf
     owner: root
@@ -20,14 +20,14 @@
     - postinstall
 
 - name: Enable systemd-timesyncd for NTP
-  service:
+  ansible.builtin.service:
     name: systemd-timesyncd
     enabled: true
   tags:
     - postinstall
 
 - name: Set hostname
-  command: hostnamectl set-hostname {{ gentoo_hostname }}
+  ansible.builtin.command: hostnamectl set-hostname {{ gentoo_hostname }}
   tags:
     - desktop
 ...

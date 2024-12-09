@@ -1,25 +1,25 @@
 ---
 - name: Install dbus
-  portage:
+  community.general.portage:
     package: sys-apps/dbus
   tags:
     - desktop
 
 - name: Install GNOME
-  portage:
+  community.general.portage:
     package: gnome-base/gnome-light
   tags:
     - desktop
 
 - name: Enable dbus
-  service:
+  ansible.builtin.service:
     name: dbus.service
     enabled: true
   tags:
     - desktop
 
 - name: Enable GDM
-  service:
+  ansible.builtin.service:
     name: gdm.service
     enabled: true
   tags:

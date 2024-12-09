@@ -1,0 +1,16 @@
+---
+- name: Sync disks before ending playbook
+  ansible.builtin.command: sync
+
+- name: Print message about shutting down
+  ansible.builtin.debug:
+    msg:
+      - "Congratulations, the system is now installed!"
+      - ""
+      - "Powering off is now left as an exercise to the reader, in case you wish to log in"
+      - "and perform any further config."
+      - ""
+      - "If you are running a virtual system it is recommended to take a snapshot including"
+      - "system memory BEFORE rebooting into the installed environment - in case you need"
+      - "to come back and fix something in the chroot."
+...

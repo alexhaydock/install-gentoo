@@ -3,6 +3,9 @@
 #   emerge --verbose --update --changed-use --deep @world
 #
 
+# Enable support for the LVM daemon and related tools
+sys-fs/lvm2 lvm
+
 # Install firmware when using genkernel
 sys-kernel/genkernel firmware
 
@@ -26,12 +29,6 @@ media-libs/freetype harfbuzz
 # Firefox
 media-libs/libvpx postproc
 dev-db/sqlite secure-delete
-
-# Neofetch
-www-client/w3m imlib
-
-# Below
-dev-lang/rust rustfmt
 
 # GNOME
 dev-libs/libgdata vala

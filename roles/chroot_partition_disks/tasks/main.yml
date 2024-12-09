@@ -3,18 +3,18 @@
 # https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks
 
 - name: Check the remote host to see whether we've already configured the disks
-  stat:
+  ansible.builtin.stat:
     path: /tmp/disks_completed
   register: disks_completed
 
 - name: "Make GPT label on {{ main_disk }}"
-  command: "parted -s {{ main_disk }} mklabel gpt"
+  ansible.builtin.command: "parted -s {{ main_disk }} mklabel gpt"
   when:
     - not disks_completed.stat.exists
 
 # We don't need a bios_grub partition if we're booting EFI
 - name: Create Grub BIOS Partition
-  parted:
+  community.general.parted:
     device: "{{ main_disk }}"
     number: 1
     part_start: '0%'
@@ -26,13 +26,13 @@
     - firmware_type == 'bios'
     - not disks_completed.stat.exists
 
-# For /boot on BIOS we do the same as with EFI but we need to set a part_start since we have the bios_grub partition before it.
-# For UEFI boot it is very important that the esp and boot flags are present on the
-# EFI system partition. Just setting 'esp' is enough as this is shorthand for 'esp, boot'.
 - name: Create /boot partition
-  parted:
+  community.general.parted:
     device: "{{ main_disk }}"
     number: "{{ boot_id }}"
+    # For /boot on BIOS we do the same as with EFI but we need to set a part_start since we have the bios_grub partition before it.
+    # For UEFI boot it is very important that the esp and boot flags are present on the
+    # EFI system partition. Just setting 'esp' is enough as this is shorthand for 'esp, boot'.
     part_start: "{{ '4MiB' if firmware_type == 'bios' else '0%' }}"
     part_end: '1GiB'
     flags: ["esp"]
@@ -42,7 +42,7 @@
     - not disks_completed.stat.exists
 
 - name: Create main data partition for our LVM container
-  parted:
+  community.general.parted:
     device: "{{ main_disk }}"
     number: "{{ root_id }}"
     part_start: '1GiB'
@@ -53,7 +53,7 @@
     - not disks_completed.stat.exists
 
 - name: Write state file to show this task has completed
-  file:
+  ansible.builtin.file:
     path: /tmp/disks_completed
     state: touch
     owner: root

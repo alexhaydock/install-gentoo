@@ -1,5 +1,5 @@
 ---
 # NOTE: This process will take a while. You can 'tail -f /var/log/emerge.log' in the chroot to track the status.
 - name: Re-emerge @world (the Gentoo Handbook places this right after using 'eselect profile')
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --verbose --update --deep --newuse @world'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --verbose --update --deep --newuse @world'
 ...

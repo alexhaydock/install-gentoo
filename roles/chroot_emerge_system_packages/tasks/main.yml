@@ -1,37 +1,51 @@
 ---
+# This is where 'base system' packages are configured.
+#
+# I consider these the bare minimum to have a working Gentoo system.
+#
+# General user-level packages for building a desktop system should
+# be added to the `postinstall_` roles, which are able to use the
+# `community.general.portage` Ansible module and should be more robust
+# then the direct command-based approach taken here.
+
 - name: Emerge dev-util/glib-utils (seems to be a dep for other packages when we rebuild @world later - particularly for app-crypt/libsecret)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge dev-util/glib-utils'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge dev-util/glib-utils'
   args:
     creates: /mnt/gentoo/usr/bin/glib-mkenums  # This is the missing binary when we try and re-emerge libsecret without glib-utils.
 
+- name: Emerge sys-power/acpid (allows proper shutdown handling as a QEMU/KVM guest)
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-power/acpid'
+  args:
+    creates: /mnt/gentoo/usr/bin/acpid
+
 - name: Emerge app-admin/syslog-ng (for logging)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-admin/syslog-ng'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-admin/syslog-ng'
   args:
     creates: /mnt/gentoo/usr/sbin/syslog-ng
 
 - name: Enable syslog-ng systemd service
-  command: chroot /mnt/gentoo bash -c 'systemctl enable syslog-ng@default.service'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'systemctl enable syslog-ng@default.service'
 
 - name: Emerge sys-process/cronie (for scheduling with cron)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-process/cronie'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-process/cronie'
   args:
     creates: /mnt/gentoo/etc/init.d/cronie
 
 - name: Enable cronie systemd service
-  command: chroot /mnt/gentoo bash -c 'systemctl enable cronie.service'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'systemctl enable cronie.service'
 
 - name: Emerge sys-boot/grub (The --deep flag is recommended on this page https://wiki.gentoo.org/wiki/GRUB2#Emerge)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --deep sys-boot/grub'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge --deep sys-boot/grub'
   args:
     creates: /mnt/gentoo/usr/sbin/grub-install
 
 - name: Emerge app-portage/gentoolkit (required to use the Portage module for Ansible when we're booted into the system)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-portage/gentoolkit'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge app-portage/gentoolkit'
   args:
     creates: /mnt/gentoo/usr/bin/equery
 
 - name: Emerge sys-fs/lvm2 (needed to provide LVM utilities in the installed system)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-fs/lvm2'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-fs/lvm2'
   args:
     creates: /mnt/gentoo/usr/sbin/lvm
 
@@ -39,18 +53,24 @@
 # map our LVM volumes to /dev/mapper and the boot process won't be able to find our swap
 # partition at /dev/mapper/main-swap, causing a 1m30s boot delay while mounting times out.
 - name: Enable lvm2-monitor systemd service
-  command: chroot /mnt/gentoo bash -c 'systemctl enable lvm2-monitor.service'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'systemctl enable lvm2-monitor.service'
 
 - name: Emerge sys-fs/xfsprogs (needed to provide utilities if we're using XFS as our filesystem)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-fs/xfsprogs'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-fs/xfsprogs'
   args:
     creates: /mnt/gentoo/usr/sbin/xfs_repair
 
 - name: Emerge net-misc/networkmanager
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge net-misc/networkmanager'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge net-misc/networkmanager'
   args:
     creates: /mnt/gentoo/usr/bin/nmtui
 
+# Needed as a build-dependency for building our default kernel config
+- name: Emerge dev-util/pahole
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge dev-util/pahole'
+  args:
+    creates: /mnt/gentoo/usr/bin/pahole
+
 - name: Enable NetworkManager systemd service
-  command: chroot /mnt/gentoo bash -c 'systemctl enable NetworkManager.service'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'systemctl enable NetworkManager.service'
 ...

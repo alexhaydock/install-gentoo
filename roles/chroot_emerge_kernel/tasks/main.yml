@@ -2,47 +2,24 @@
 # Kernel (genkernel) config
 # https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel
 
-- name: Check whether we've built a kernel yet
-  stat:
-    path: /tmp/kernel_built
-  register: kernel_built
-
 - name: Emerge sys-kernel/gentoo-sources
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/gentoo-sources'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/gentoo-sources'
   args:
     creates: /mnt/gentoo/usr/src/linux/arch
-  when:
-    - not kernel_built.stat.exists
 
 - name: Emerge sys-kernel/genkernel (this step does not actually build the kernel yet, just installs the kernel-building tool and dependencies like linux-firmware)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; emerge sys-kernel/genkernel'
   args:
     creates: /mnt/gentoo/usr/bin/genkernel
-  when:
-    - not kernel_built.stat.exists
 
-- name: Select the default Genkernel kernel so we have a build target for 'genkernel all'
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; eselect kernel set 1'
-  when:
-    - not kernel_built.stat.exists
+- name: Select the default Genkernel kernel so we have a build target for genkernel
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; eselect kernel set 1'
 
-- name: Build Kernel using 'genkernel all'
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel all'
-  when:
-    - not kernel_built.stat.exists
+# We use the config from the running LiveCD because it has good support for VirtIO disks and
+# other things that aren't in the default genkernel config
+- name: Build Kernel using genkernel, based on the .config from the kernel used to boot the LiveCD
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel kernel --install --kernel-config=/proc/config.gz'
 
-- name: Build and install initramfs with LVM support
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel --lvm --install initramfs'
-  when:
-    - not kernel_built.stat.exists
-
-- name: Write state file to show this task has completed
-  file:
-    path: /tmp/kernel_built
-    state: touch
-    owner: root
-    group: root
-    mode: '0644'
-  when:
-    - not kernel_built.stat.exists
+- name: Build initramfs with genkernel, adding flags to ensure it's built with LVM support
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; genkernel initramfs --install --lvm --kernel-config=/proc/config.gz'
 ...

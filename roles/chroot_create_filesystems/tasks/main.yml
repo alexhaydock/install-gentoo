@@ -1,11 +1,11 @@
 ---
 - name: Check the remote host to see whether we've already configured the filesystems
-  stat:
+  ansible.builtin.stat:
     path: /tmp/filesystems_completed
   register: filesystems_completed
 
 - name: Format /boot Partition
-  filesystem:
+  community.general.filesystem:
     fstype: "vfat"
     dev: "{{ boot_partition }}"
     force: "{{ force_format }}"
@@ -14,14 +14,14 @@
     - not filesystems_completed.stat.exists
 
 - name: Create main LVM group
-  lvg:
+  community.general.lvg:
     pvs: "{{ root_partition }}"
     vg: "{{ vg_name }}"
   when:
     - not filesystems_completed.stat.exists
 
 - name: Create swap volume
-  lvol:
+  community.general.lvol:
     lv: swap
     vg: "{{ vg_name }}"
     size: "{{ swap_size }}"
@@ -29,7 +29,7 @@
     - not filesystems_completed.stat.exists
 
 - name: Format swap volume
-  command: "mkswap /dev/mapper/{{ vg_name }}-swap"
+  ansible.builtin.command: "mkswap /dev/mapper/{{ vg_name }}-swap"
   when:
     - not filesystems_completed.stat.exists
 
@@ -37,12 +37,12 @@
 # error out due to what appeared to be an OOM error:
 # https://stackoverflow.com/questions/37128813/installing-lxml-error-open-cfi-at-the-end-of-file-missing-cfi-endproc-direct
 - name: Enable swap now (it will help us build big things later!)
-  command: "swapon /dev/mapper/{{ vg_name }}-swap"
+  ansible.builtin.command: "swapon /dev/mapper/{{ vg_name }}-swap"
   when:
     - not filesystems_completed.stat.exists
 
 - name: Create root lvm volume group
-  lvol:
+  community.general.lvol:
     lv: root
     vg: "{{ vg_name }}"
     size: "{{ root_size }}"
@@ -51,7 +51,7 @@
     - not filesystems_completed.stat.exists
 
 - name: Format root volume
-  filesystem:
+  community.general.filesystem:
     fstype: "{{ mainfstype }}"
     dev: "/dev/mapper/{{ vg_name }}-root"
     force: "{{ force_format }}"
@@ -59,14 +59,14 @@
     - not filesystems_completed.stat.exists
 
 - name: Create mountpoints
-  file:
+  ansible.builtin.file:
     path: /mnt/gentoo/boot
     state: directory
   when:
     - not filesystems_completed.stat.exists
 
 - name: Mount /
-  mount:
+  ansible.posix.mount:
     path: /mnt/gentoo
     src: /dev/mapper/{{ vg_name }}-root
     fstab: /tmp/tmp_fstab
@@ -76,7 +76,7 @@
     - not filesystems_completed.stat.exists
 
 - name: Mount /boot
-  mount:
+  ansible.posix.mount:
     path: /mnt/gentoo/boot
     src: "{{ boot_partition }}"
     fstab: /tmp/tmp_fstab
@@ -86,7 +86,7 @@
     - not filesystems_completed.stat.exists
 
 - name: Write state file to show this task has completed
-  file:
+  ansible.builtin.file:
     path: /tmp/filesystems_completed
     state: touch
     owner: root

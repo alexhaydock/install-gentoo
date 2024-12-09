@@ -1,6 +1,6 @@
 ---
 - name: Emerge Flatpak
-  portage:
+  community.general.portage:
     package: sys-apps/flatpak
   tags:
     - postinstall

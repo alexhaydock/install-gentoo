@@ -2,9 +2,8 @@
 # For some reason the python2.7 emerge (dependency of something else) breaks if we don't remount /dev before emerging it
 # See: https://forums.gentoo.org/viewtopic-t-982100-start-0.html
 - name: Remount /dev to make sure /dev/mapper is visible (otherwise emerging python2.7 breaks later on)
-  command: mount --rbind /dev /mnt/gentoo/dev
+  ansible.builtin.command: mount --rbind /dev /mnt/gentoo/dev
   args:
-    warn: false
   tags:
     - skip_ansible_lint
 ...

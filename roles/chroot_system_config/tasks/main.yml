@@ -1,9 +1,9 @@
 ---
 - name: Set timezone
-  command: chroot /mnt/gentoo bash -c 'cp /usr/share/zoneinfo/{{ timezone }} /etc/localtime; echo "{{ timezone }}" > /etc/timezone'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'cp /usr/share/zoneinfo/{{ timezone }} /etc/localtime; echo "{{ timezone }}" > /etc/timezone'
 
 - name: Configure /etc/hosts
-  template:
+  ansible.builtin.template:
     src: hosts
     dest: /mnt/gentoo/etc/hosts
     owner: root
@@ -11,23 +11,26 @@
     mode: '0644'
 
 - name: Configure /etc/fstab
-  template:
+  ansible.builtin.template:
     src: fstab
     dest: /mnt/gentoo/etc/fstab
     owner: root
     group: root
     mode: '0644'
 
-- name: Create /etc/portage/make.conf (idempotent, runs even if we've run this role before)
-  template:
+# The make.conf and package.use files will be copied to the destination even if we've
+# run through this playbook before. This allows us to make updates to resolve any issues
+# during the system installation, and re-run the playbook to fix them.
+- name: Create /etc/portage/make.conf (runs even if we've run this role before)
+  ansible.builtin.template:
     src: make.conf
     dest: /mnt/gentoo/etc/portage/make.conf
     owner: root
     group: root
     mode: '0644'
 
-- name: Create /etc/portage/package.use (idempotent, runs even if we've run this role before)
-  copy:
+- name: Create /etc/portage/package.use (runs even if we've run this role before)
+  ansible.builtin.copy:
     src: package.use
     dest: /mnt/gentoo/etc/portage/package.use
     owner: root
@@ -35,7 +38,7 @@
     mode: '0644'
 
 - name: Copy locale.gen over to configure the supported locales for the system
-  copy:
+  ansible.builtin.copy:
     src: locale.gen
     dest: /etc/locale.gen
     owner: root
@@ -43,16 +46,16 @@
     mode: '0644'
 
 - name: Configure locales
-  command: chroot /mnt/gentoo bash -c 'locale-gen'
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'locale-gen'
 
 - name: Set locale
-  copy:
+  ansible.builtin.copy:
     src: 02locale
     dest: /etc/env.d/02locale
     owner: root
     group: root
     mode: '0644'
 
-- name: Update environment with env-update (idempotent, runs even if we've run this role before)
-  command: chroot /mnt/gentoo bash -c 'source /etc/profile; env-update'
+- name: Update environment with env-update (runs even if we've run this role before)
+  ansible.builtin.command: chroot /mnt/gentoo bash -c 'source /etc/profile; env-update'
 ...
