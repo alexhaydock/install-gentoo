@@ -35,3 +35,6 @@ dev-libs/libgdata vala
 
 # Flatpak
 dev-util/ostree curl
+
+# Avoid dependency loop
+dev-python/pillow -truetype

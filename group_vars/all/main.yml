@@ -22,7 +22,7 @@ mirror: "https://www.mirrorservice.org/sites/distfiles.gentoo.org"
 # Configure disk layout
 # Note: If testing in libvirt/QEMU then be aware that the main disk will turn up as /dev/vda
 force_format: true
-main_disk: /dev/sda
+main_disk: /dev/vda
 mainfstype: xfs  # Using XFS since EXT4 seemed to suffer inode exhaustion during 'emerge --sync'
 root_size: 95%FREE
 swap_size: 4096m

@@ -16,7 +16,7 @@
     - chroot_emerge_kernel
     - chroot_configure_networking
     - chroot_emerge_system_packages
-    - chroot_emerge_bootloader
+    - chroot_install_bootloader
     - chroot_configure_users
     - chroot_configure_ssh
     - chroot_cleanup_and_shutdown

@@ -50,13 +50,18 @@ To use this Ansible Playbook, you will need a system somewhere on your network b
 ### Install initial system (runs against LiveCD)
 Deploy the first stage of installation (targets the booted LiveCD) with:
 ```sh
-ansible-playbook install.yml -vvv -i 'gentoo,' --ask-pass --extra-vars "ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root ansible_host=10.42.2.102"
+ansible-playbook install.yml -v -i 'gentoo,' --ask-pass --extra-vars "ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root ansible_host=10.42.2.102 ansible_port=22"
+```
+
+If you are testing using a [Quickemu](https://github.com/quickemu-project/quickemu) VM, you can configure the target host to use loopback and the port that Quickemu sets up for SSH forwarding to the VM. e.g:
+```sh
+ansible_host=127.0.0.1 ansible_port=22220
 ```
 
 ### Install system packages (runs against newly-installed system after a reboot)
 and then, once the system is installed and the remote host has rebooted:
 ```sh
-ansible-playbook postinstall.yml -vvv -i 'gentoo,' --ask-pass --extra-vars "ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root ansible_host=10.42.2.102"
+ansible-playbook postinstall.yml -v -i 'gentoo,' --ask-pass --extra-vars "ansible_ssh_common_args='-o StrictHostKeyChecking=no' ansible_user=root ansible_host=10.42.2.102 ansible_port=22"
 ```
 
 ---
