@@ -94,3 +94,6 @@ chroot /mnt/gentoo bash
 I experimented briefly with using a ["Distribution Kernel"](https://wiki.gentoo.org/wiki/Project:Distribution_Kernel) to simplify the deployment process here. This automates a bunch of steps including building the `initramfs` that the bootloader hands off to. Unfortunately, it seems like the default config used by `sys-kernel/gentoo-kernel` when building the initramfs does not include LVM support (at least it didn't when I tried).
 
 Instead of taking the Distribution Kernel approach, I instead use [Genkernel](https://wiki.gentoo.org/wiki/Genkernel) and build our `initramfs` using `genkernel --lvm --install initramfs`, which builds with LVM support and allows us to boot to a disk that is partitioned using LVM.
+
+### Unable to encrypt nor hash, passlib must be installed.
+If Ansible throws this error during user management operations, it is talking about the _local Ansible environment_ and not the Gentoo system itself. Install `python3-passlib` on your local Ansible system.

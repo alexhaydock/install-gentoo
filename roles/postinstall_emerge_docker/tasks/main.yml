@@ -3,8 +3,8 @@
   community.general.portage:
     package: '{{ item }}'
   with_items:
-    - app-emulation/docker
-    - dev-python/docker-py
+    - app-containers/docker
+    - dev-python/docker
   tags:
     - postinstall
 
