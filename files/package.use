@@ -38,3 +38,6 @@ dev-util/ostree curl
 
 # Avoid dependency loop
 dev-python/pillow -truetype
+
+# Enable flags to build QEMU GPU support
+*/* VIDEO_CARDS: virgl

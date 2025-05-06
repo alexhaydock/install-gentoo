@@ -1,4 +1,16 @@
 ---
+- name: Install mesa
+  community.general.portage:
+    package: media-libs/mesa
+  tags:
+    - desktop
+
+- name: Install xorg-drivers
+  community.general.portage:
+    package: x11-base/xorg-drivers
+  tags:
+    - desktop
+
 - name: Install dbus
   community.general.portage:
     package: sys-apps/dbus
